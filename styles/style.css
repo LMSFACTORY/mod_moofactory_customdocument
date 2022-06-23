@@ -1,0 +1,64 @@
+table tbody td:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* body {
+  display: none !important;
+} */
+#table-course th {
+  background-color: #92278f;
+  color: #fff;
+}
+
+#table-user-profile th {
+  background: #f15a29;
+  color: #fff;
+}
+
+#table-carnet th {
+  background: #95b43c;
+  color: #fff;
+}
+
+#table-dates th {
+  background: #45b2dd;
+  color: #fff;
+}
+
+#table-time th {
+  background: #f7941d;
+  color: #fff;
+}
+#table-attribution th {
+  background-color: #d42a4b;
+  color: #fff;
+}
+#table-document-info th {
+  background-color: #333333;
+  color: #fff;
+}
+h1 {
+  margin-bottom: 2.5rem;
+  color: #92278f;
+}
+.container {
+  margin-top: 15px;
+}
+
+#table-certificate-delivery th {
+  cursor: pointer !important;
+  position: relative;
+}
+.th-sort-asc::after {
+  content: "\25b4";
+  width: 5px;
+  height: 5px;
+}
+.th-sort-desc::after {
+  content: "\25be";
+  width: 5px;
+  height: 5px;
+}

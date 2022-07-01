@@ -2709,7 +2709,14 @@ class customdocument {
         $pagestart = intval($page * $perpage);
         $usercount = 0;
         if (!$selectedusers) {
-            $users = get_enrolled_users($coursectx, '', $groupid);
+            // Seuls les users ayant accès au certificat sont pris en compte
+            $enrolledusers = get_enrolled_users($coursectx, '', $groupid);
+            foreach ($enrolledusers as $user) {
+                $canissue = $this->can_issue($user, $issuelist != 'allusers');
+                if (empty($canissue)) {
+                    $users[$user->id] = $user;
+                }
+            }
             $usercount = count($users);
 
         } else {

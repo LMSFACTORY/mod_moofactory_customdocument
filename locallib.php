@@ -2180,15 +2180,17 @@ class customdocument {
      * @param int $userid User id
      * @return string null if user meet issued conditions, or an text with erro
      */
-    protected function can_issue($user = null, $chkcompletation = true) {
+    protected function can_issue($user = null, $chkcompletation = true, $isstudent = false) {
         global $USER, $CFG;
 
         if (empty($user)) {
             $user = $USER;
         }
 
-        if (has_capability('mod/customdocument:manage', $this->context, $user)) {
-            return 'Manager user';
+        if (has_capability('mod/simplecertificate:manage', $this->context, $user)) {
+            if(!$isstudent){
+                return 'Manager user';
+            }
         }
 
         if ($chkcompletation) {
@@ -2695,6 +2697,9 @@ class customdocument {
 
         $coursectx = context_course::instance($this->get_course()->id);
 
+        $studentroles = array_keys(get_archetype_roles('student'));
+        $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+
         $page = $url->get_param('page');
         $perpage = $url->get_param('perpage');
         $issuelist = $url->get_param('issuelist');
@@ -2710,9 +2715,10 @@ class customdocument {
         $usercount = 0;
         if (!$selectedusers) {
             // Seuls les users ayant accès au certificat sont pris en compte
+            // Les users ayant plusieurs rôles sont concernés s'ils sont student
             $enrolledusers = get_enrolled_users($coursectx, '', $groupid);
             foreach ($enrolledusers as $user) {
-                $canissue = $this->can_issue($user, $issuelist != 'allusers');
+                $canissue = $this->can_issue($user, $issuelist != 'allusers', !empty($students[$user->id]));
                 if (empty($canissue)) {
                     $users[$user->id] = $user;
                 }
@@ -2780,7 +2786,7 @@ class customdocument {
 
 
             foreach ($users as $user) {
-                $canissue = $this->can_issue($user, $issuelist != 'allusers');
+                $canissue = $this->can_issue($user, $issuelist != 'allusers', !empty($students[$user->id]));
                 if (empty($canissue)) {
                     $chkbox = html_writer::checkbox('selectedusers[]', $user->id, false);
                     $name = $OUTPUT->user_picture($user) . $user->firstname;
@@ -2817,7 +2823,7 @@ class customdocument {
                 case 'zip':
                     $filesforzipping = array();
                     foreach ($users as $user) {
-                        $canissue = $this->can_issue($user, $issuelist != 'allusers');
+                        $canissue = $this->can_issue($user, $issuelist != 'allusers', !empty($students[$user->id]));
                         if (empty($canissue)) {
                             $issuedcert = $this->get_issue($user);
                             $file = $this->get_issue_file($issuedcert);
@@ -2842,7 +2848,7 @@ class customdocument {
 
                 case 'email':
                     foreach ($users as $user) {
-                        $canissue = $this->can_issue($user, $issuelist != 'allusers');
+                        $canissue = $this->can_issue($user, $issuelist != 'allusers', !empty($students[$user->id]));
                         if (empty($canissue)) {
                             $issuedcert = $this->get_issue($user);
                             if ($this->get_issue_file($issuedcert)) {
@@ -2861,7 +2867,7 @@ class customdocument {
                     $pdf = $this->create_pdf_object();
 
                     foreach ($users as $user) {
-                        $canissue = $this->can_issue($user, $issuelist != 'allusers');
+                        $canissue = $this->can_issue($user, $issuelist != 'allusers', !empty($students[$user->id]));
                         if (empty($canissue)) {
                             // To one pdf file.
                             $issuedcert = $this->get_issue($user);

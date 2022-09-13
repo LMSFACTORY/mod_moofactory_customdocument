@@ -51,17 +51,17 @@ echo $OUTPUT->header();
             <tbody>
                 <!-- Début de Champs de cours -->
                 <tr>
-                    <td>{COURSENAME}</td>
+                    <td>{{COURSENAME}}</td>
                     <td>
                         <?php echo get_string('coursenamedesc', 'customdocument') ;?>
                     </td>
                 </tr>
                 <tr>
-                    <td>{COURSESTARTDATE}</td>
+                    <td>{{COURSESTARTDATE}}</td>
                     <td><?php echo get_string('coursestartdatedesc', 'customdocument') ;?></td>
                 </tr>
                 <tr>
-                    <td>{COURSEENDDATE}</td>
+                    <td>{{COURSEENDDATE}}</td>
                     <td><?php echo get_string('courseenddatedesc', 'customdocument') ;?></td>
                 </tr>
                 <!-- Fin de Champs de cours -->
@@ -80,63 +80,63 @@ echo $OUTPUT->header();
                 <!-- Début de Champs de profil de l'utilisateur -->
                 <tr>
 
-                    <td>{FULLNAME}</td>
+                    <td>{{FULLNAME}}</td>
                     <td><?php echo get_string('usernamedesc', 'customdocument') ?></td>
                 </tr>
 
                 <tr>
-                    <td>{FIRSTNAME}</td>
+                    <td>{{FIRSTNAME}}</td>
                     <td><?php echo get_string('firstnamedesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{LASTNAME}</td>
+                    <td>{{LASTNAME}}</td>
                     <td><?php echo get_string('lastnamedesc', 'customdocument') ?></td>
                 </tr>
 
                 <tr>
-                    <td>{EMAIL}</td>
+                    <td>{{EMAIL}}</td>
                     <td><?php echo get_string('emaildesc', 'customdocument') ?></td>
                 </tr>
 
                 <tr>
-                    <td>{CITY}</td>
+                    <td>{{CITY}}</td>
                     <td><?php echo get_string('citydesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{COUNTRY}</td>
+                    <td>{{COUNTRY}}</td>
                     <td><?php echo get_string('countrydesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{USERIMAGE}</td>
+                    <td>{{USERIMAGE}}</td>
                     <td><?php echo get_string('userimage', 'customdocument') ?></td>
                 </tr>
 
                 <tr>
-                    <td>{IDNUMBER}</td>
+                    <td>{{IDNUMBER}}</td>
                     <td><?php echo get_string('idnumberdesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{INSTITUTION}</td>
+                    <td>{{INSTITUTION}}</td>
                     <td><?php echo get_string('institutiondesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{DEPARTMENT}</td>
+                    <td>{{DEPARTMENT}}</td>
                     <td><?php echo get_string('departmentdesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{PHONE1}</td>
+                    <td>{{PHONE1}}</td>
                     <td><?php echo get_string('phone1desc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{PHONE2}</td>
+                    <td>{{PHONE2}}</td>
                     <td><?php echo get_string('phone2desc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{ADDRESS}</td>
+                    <td>{{ADDRESS}}</td>
                     <td><?php echo get_string('addressdesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{PROFILE_XXX}</td>
+                    <td>{{PROFILE_XXX}}</td>
                     <td>
                         <?php echo get_string('profile_xxxx_desc', 'customdocument') ?>
                     </td>
@@ -154,15 +154,15 @@ echo $OUTPUT->header();
             <tbody>
                 <tr>
 
-                    <td>{GRADE}</td>
+                    <td>{{GRADE}}</td>
                     <td><?php echo get_string('gradesdesc', 'customdocument')?></td>
                 </tr>
                 <tr>
-                    <td>{ACTIVITYGRADES}</td>
+                    <td>{{ACTIVITYGRADES}}</td>
                     <td><?php echo get_string('activitygradesdesc', 'customdocument')?></td>
                 </tr>
                 <tr>
-                    <td>{OUTCOME}</td>
+                    <td>{{OUTCOME}}</td>
                     <td>
                         <?php echo get_string('outcomedesc', 'customdocument'); ?>
                     </td>
@@ -180,39 +180,39 @@ echo $OUTPUT->header();
 
             <tbody>
                 <tr>
-                    <td>{ACTIVITYCOMPLETIONDATE}</td>
+                    <td>{{ACTIVITYCOMPLETIONDATE}}</td>
                     <td><?php echo get_string('activitycompletiondesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{DELIVERANCEDATE}</td>
+                    <td>{{DELIVERANCEDATE}}</td>
                     <td><?php echo get_string('deliverancedatedesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{COURSECOMPLETIONDATE}</td>
+                    <td>{{COURSECOMPLETIONDATE}}</td>
                     <td><?php echo get_string('coursecompletiondesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{COURSEENDDATE}</td>
+                    <td>{{COURSEENDDATE}}</td>
                     <td><?php echo get_string('courseenddatedesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{COURSESTARTDATE}</td>
+                    <td>{{COURSESTARTDATE}}</td>
                     <td><?php echo get_string('coursestartdatedesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{COURSEFIRSTACCESS}</td>
+                    <td>{{COURSEFIRSTACCESS}}</td>
                     <td><?php echo get_string('coursefirstaccessdesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{COURSELASTACCESS}</td>
+                    <td>{{COURSELASTACCESS}}</td>
                     <td><?php echo get_string('courselastaccessdesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{ENROLMENTTIMESTART}</td>
+                    <td>{{ENROLMENTTIMESTART}}</td>
                     <td><?php echo get_string('enrolmentstartdesc', 'customdocument'); ?></td>
                 </tr>
                 <tr>
-                    <td>{ENROLMENTTIMEEND}</td>
+                    <td>{{ENROLMENTTIMEEND}}</td>
                     <td><?php echo get_string('enrolmentenddesc', 'customdocument'); ?></td>
                 </tr>
             </tbody>
@@ -226,7 +226,7 @@ echo $OUTPUT->header();
             </tr>
             <tbody>
                 <tr>
-                    <td rowspan="2">{USERMOOFACTORYTIME}</td>
+                    <td rowspan="2">{{USERMOOFACTORYTIME}}</td>
                     <td><?php echo get_string('usermoofactorytimedesc', 'customdocument');?></td>
                 </tr>
             </tbody>
@@ -235,11 +235,11 @@ echo $OUTPUT->header();
         <div>
             <span>
 
-                <?php if(!array_key_exists('moofactory', \core_component::get_plugin_list('format'))){
+                <?php if(!array_key_exists('moofactory', \core_component::get_plugin_list('format'))){{
                             echo '<div class="alert alert-warning fade-in pt-3">'. get_string('formatwarning', 'customdocument') .'</div>';
-                        }else{
+                        }}else{{
                             echo '<div class="alert alert-info fade-in pt-3">'. get_string('formatfound', 'customdocument') .'</div>';
-                        }
+                        }}
                         ?>
             </span>
         </div>
@@ -251,15 +251,15 @@ echo $OUTPUT->header();
             </tr>
             <tbody>
                 <tr>
-                    <td>{TEACHERS}</td>
+                    <td>{{TEACHERS}}</td>
                     <td><?php echo get_string('teachersdesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{USERROLENAME}</td>
+                    <td>{{USERROLENAME}}</td>
                     <td><?php echo get_string('userroledesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
-                    <td>{GROUPNAMES}</td>
+                    <td>{{GROUPNAMES}}</td>
                     <td><?php echo get_string('groupnamedesc', 'customdocument') ?></td>
                 </tr>
             </tbody>
@@ -273,7 +273,7 @@ echo $OUTPUT->header();
             </tr>
             <tbody>
                 <tr>
-                    <td>{CERTIFICATECODE}</td>
+                    <td>{{CERTIFICATECODE}}</td>
                     <td><?php echo get_string('certcodedesc', 'customdocument') ?></td>
                 </tr>
 

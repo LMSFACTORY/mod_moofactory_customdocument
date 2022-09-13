@@ -633,7 +633,12 @@ class customdocument {
             // Avoiding not null restriction.
             $issuedcert->pathnamehash = '';
 
-            if (has_capability('mod/customdocument:manage', $this->context, $userid)) {
+            $coursectx = context_course::instance($this->get_course()->id);
+            $studentroles = array_keys(get_archetype_roles('student'));
+            $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+            $isnotstudent = empty($students[$userid]);
+
+            if (has_capability('mod/simplecertificate:manage', $this->context, $userid) && $isnotstudent) {
                 $issuedcert->id = 0;
             } else {
                 $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
@@ -1224,13 +1229,18 @@ class customdocument {
             $issuecert->pathnamehash = $file->get_pathnamehash();
 
             // Verify if user is a manager, if not, update issuedcert.
-            if (!has_capability('mod/customdocument:manage',
-                $this->context, $issuecert->userid) && !$DB->update_record('customdocument_issues',
-                    $issuecert)) {
-                    print_error('cannotupdatemod', 'error', null, 'customdocument_issue');
-                    return false;
+            $coursectx = context_course::instance($this->get_course()->id);
+            $studentroles = array_keys(get_archetype_roles('student'));
+            $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+            $isstudent = !empty($students[$issuecert->userid]);
+            $ismanager = has_capability('mod/simplecertificate:manage', $this->context, $issuecert->userid);
+
+            // Verify if user is a manager, if not, update issuedcert.
+            if ((!$ismanager || ($ismanager && $isstudent)) && !$DB->update_record('simplecertificate_issues', $issuecert)) {
+                print_error('cannotupdatemod', 'error', null, 'customdocument_issue');
+                return false;
             }
-             return $file;
+            return $file;
         }
     }
 
@@ -1552,15 +1562,22 @@ class customdocument {
         }
         $a = (array)$a;
 
+        // For compatibility with previous versions user's documents, $search and $search2 are used 
         $search = array();
+        $search2 = array();
         $replace = array();
         foreach ($a as $key => $value) {
             $search[] = '{' . strtoupper($key) . '}';
+            $search2[] = '{{' . strtoupper($key) . '}}';
             // Due #148 bug, i must disable filters, because activities names {USERRESULTS}
             // will be replaced by actitiy link, don't make sense put activity link
             // in the certificate, only activity name and grade
             // para=> false to remove the <div> </div>  form strings.
             $replace[] = (string)$value;
+        }
+
+        if ($search2) {
+            $certtext = str_replace($search2, $replace, $certtext);
         }
 
         if ($search) {

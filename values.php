@@ -235,11 +235,11 @@ echo $OUTPUT->header();
         <div>
             <span>
 
-                <?php if(!array_key_exists('moofactory', \core_component::get_plugin_list('format'))){{
+                <?php if(!array_key_exists('moofactory', \core_component::get_plugin_list('format'))){
                             echo '<div class="alert alert-warning fade-in pt-3">'. get_string('formatwarning', 'customdocument') .'</div>';
-                        }}else{{
+                        }else{
                             echo '<div class="alert alert-info fade-in pt-3">'. get_string('formatfound', 'customdocument') .'</div>';
-                        }}
+                        }
                         ?>
             </span>
         </div>

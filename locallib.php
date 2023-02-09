@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple Certificate module core interaction API
+ * Custom Document module core interaction API
  *
  * @package mod
  * @subpackage customdocument
@@ -70,7 +70,7 @@ class customdocument {
     const BULK_ISSUE_CERTIFCADES_VIEW = 2;
 
     // Pagination.
-    const SIMPLECERT_MAX_PER_PAGE = 200;
+    const CUSTOMDOCUMENT_MAX_PER_PAGE = 200;
 
     /**
      *
@@ -149,11 +149,6 @@ class customdocument {
         $this->course = $DB->get_record('course', array('id' => $formdata->course), '*', MUST_EXIST);
 
         $this->instance = $DB->get_record('customdocument', array('id' => $returnid), '*', MUST_EXIST);
-        // var_dump($formdata);
-        // echo '<br>';
-        // var_dump($update);
-        // var_dump($returnid);
-        // die;
         if (class_exists('\core_completion\api')) {
             $completiontimeexpected = !empty($update->completionexpected) ? $update->completionexpected : null;
             \core_completion\api::update_completion_date_event($update->coursemodule, 'customdocument', $returnid, $completiontimeexpected);
@@ -638,7 +633,7 @@ class customdocument {
             $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
             $isnotstudent = empty($students[$userid]);
 
-            if (has_capability('mod/simplecertificate:manage', $this->context, $userid) && $isnotstudent) {
+            if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
                 $issuedcert->id = 0;
             } else {
                 $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
@@ -1180,7 +1175,7 @@ class customdocument {
             if ($this->issue_file_exists($issuecert)) {
                 return $this->get_issue_file($issuecert);
             } else {
-                print_error(get_string('filenotfound', 'customdocument'));
+                print_error(get_string('filenotfound', 'customdocument', ''));
                 return false;
             }
         } else {
@@ -1216,7 +1211,14 @@ class customdocument {
             );
 
             $fs = get_file_storage();
-            $file = $fs->create_file_from_string($fileinfo, $pdf->Output('', 'S'));
+           
+            if($fs->file_exists($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename'])){
+                $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
+            }
+            else{
+                $file = $fs->create_file_from_string($fileinfo, $pdf->Output('', 'S'));
+            }
+
             if (!$file) {
                 print_error('cannotsavefile', 'error', '', $fileinfo['filename']);
                 return false;
@@ -1228,16 +1230,15 @@ class customdocument {
 
             $issuecert->pathnamehash = $file->get_pathnamehash();
 
-            // Verify if user is a manager, if not, update issuedcert.
             $coursectx = context_course::instance($this->get_course()->id);
             $studentroles = array_keys(get_archetype_roles('student'));
             $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
             $isstudent = !empty($students[$issuecert->userid]);
-            $ismanager = has_capability('mod/simplecertificate:manage', $this->context, $issuecert->userid);
+            $ismanager = has_capability('mod/customdocument:manage', $this->context, $issuecert->userid);
 
             // Verify if user is a manager, if not, update issuedcert.
-            if ((!$ismanager || ($ismanager && $isstudent)) && !$DB->update_record('simplecertificate_issues', $issuecert)) {
-                print_error('cannotupdatemod', 'error', null, 'customdocument_issue');
+            if ((!$ismanager || ($ismanager && $isstudent)) && !$DB->update_record('customdocument_issues', $issuecert)) {
+                print_error('cannotupdatemod', 'error', null, 'customdocument_issues');
                 return false;
             }
             return $file;
@@ -1292,7 +1293,7 @@ class customdocument {
 
             return $ret;
         } else {
-            print_error(get_string('filenotfound', 'customdocument'));
+            print_error(get_string('filenotfound', 'customdocument', ''));
         }
     }
 
@@ -1401,11 +1402,16 @@ class customdocument {
                 break;
             }
 
-            if (has_capability('mod/customdocument:manage', $this->context, $issuecert->userid)) {
+            $coursectx = context_course::instance($this->get_course()->id);
+            $studentroles = array_keys(get_archetype_roles('student'));
+            $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+            $isnotstudent = empty($students[$issuecert->userid]);
+
+            if (has_capability('mod/customdocument:manage', $this->context, $issuecert->userid) && $isnotstudent) {
                 $file->delete();
             }
         } else {
-            print_error(get_string('filenotfound', 'customdocument'));
+            print_error(get_string('filenotfound', 'customdocument', ''));
         }
     }
 
@@ -2341,7 +2347,6 @@ class customdocument {
 
         } else { // Output to pdf.
             if ($this->get_instance()->delivery != 3 || $canmanage) {
-
                 $this->output_pdf($this->get_issue($USER));
             }
         }

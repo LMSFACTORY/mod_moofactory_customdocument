@@ -40,7 +40,7 @@ $string['pluginadministration'] = 'Document administration';
 $string['deletissuedcertificates'] = 'Delete issued documents';
 $string['nocertificatesissued'] = 'There are no issued document';
 $string['awardedsubject'] = 'Awarded document notification: {$a->document} issued to {$a->student}';
-$string['modulename_help'] = 'The simple document activity module enables the teacher to create a custom document that can be issued to participants who have completed the teacher’s specified requirements.';
+$string['modulename_help'] = 'The custom document activity module enables the teacher to create a custom document that can be issued to participants who have completed the teacher’s specified requirements.';
 $string['certificatecopy'] = 'COPY';
 
 // General
@@ -200,9 +200,9 @@ $string['eventcertificate_verified'] = 'Document verified';
 $string['eventcertificate_verified_description'] = 'The user with id {$a->userid} verified the document with id {$a->certificateid}, issued to user with id {$a->document_userid}.';
 
 // For Capabilities
-$string['customdocument:addinstance'] = "Add Simple Document Activity";
-$string['customdocument:manage'] = "Manage Simple Document Activity";
-$string['customdocument:view'] = "View Simple Document Activity";
+$string['customdocument:addinstance'] = "Add Custom document Activity";
+$string['customdocument:manage'] = "Manage Custom document Activity";
+$string['customdocument:view'] = "View Custom document Activity";
 
 // Erreurs
 $string['filenotfound'] = 'File not Found : {$a}';
@@ -214,7 +214,7 @@ $string['usercontextnotfound'] = 'User context not found';
 $string['usernotfound'] = 'User not found';
 $string['coursenotfound'] = 'Course not found';
 $string['issuedcertificatenotfound'] = 'Issued document not found';
-$string['certificatenot'] = 'Simple document instance not found';
+$string['certificatenot'] = 'Custom document instance not found';
 
 $string['upgradeerror'] = 'Error while upgrading $a';
 $string['notreceived'] = 'No issued document';

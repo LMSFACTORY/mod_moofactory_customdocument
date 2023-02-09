@@ -412,7 +412,7 @@ class testable_customdocument extends customdocument {
     }
 
     public function testable_get_issued_certificate_users ($sort="ci.timecreated ASC", $groupmode=0, $page = 0,
-                    $perpage = self::SIMPLECERT_MAX_PER_PAGE) {
+                    $perpage = self::CUSTOMDOCUMENT_MAX_PER_PAGE) {
 
         return parent::get_issued_certificate_users($sort, $groupmode, $page, $perpage);
     }

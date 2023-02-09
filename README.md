@@ -1,6 +1,3 @@
-* [![Build Status](https://travis-ci.org/bozoh/moodle-mod_customdocument.svg?branch=release/MOODLE_38_STABLE)](https://travis-ci.org/bozoh/moodle-mod_customdocument) - Moodle 3.8
-* [![Analytics](https://ga-beacon.appspot.com/UA-162885832-2/simplecerticate/plugin/readme?pixel)](https://github.com/bozoh/moodle-mod_customdocument)
-
 
 ## CLONE
 

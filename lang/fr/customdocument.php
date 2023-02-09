@@ -41,7 +41,7 @@ $string['pluginadministration'] = 'Administration du document';
 $string['deletissuedcertificates'] = 'Supprimer les documents délivrés';
 $string['nocertificatesissued'] = 'Il n\'y a aucun document délivré.';
 $string['awardedsubject'] = 'Notification de document émis : {$a->document} délivré à {$a->student}';
-$string['modulename_help'] = 'Document personnalisé permet aux enseignants/formateurs de créer un document personalisé (attestation...) pouvant être délivré aux participants ayant levé les restrictions d\'accès de l\'activité.';
+$string['modulename_help'] = 'Document personnalisé permet aux enseignants/formateurs de créer un document personnalisé (attestation...) pouvant être délivré aux participants ayant levé les restrictions d\'accès de l\'activité.';
 $string['certificatecopy'] = 'COPIER';
 
 // Généraux

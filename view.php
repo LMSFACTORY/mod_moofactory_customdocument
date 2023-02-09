@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple Certificate activity module
+ * Custom Document activity module
  *
  * @package    mod
  * @subpackage customdocument

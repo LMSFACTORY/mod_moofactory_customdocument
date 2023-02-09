@@ -126,7 +126,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         $sql = 'UPDATE {customdocument} SET certdatefmt = \'\' WHERE certdatefmt = :old_5 OR certdatefmt = :old_6';
         $DB->execute($sql, array('old_5' => '5', 'old_6' => '6'));
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2013053102, 'customdocument');
     }
 
@@ -214,7 +214,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
                         array($cert->name, $cert->id));
         }
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2013092000, 'customdocument');
     }
 
@@ -247,7 +247,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
             $DB->execute($sql);
         }
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2013111900, 'customdocument');
     }
     if ($oldversion < 2013112500) {
@@ -263,7 +263,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         // Launch change of nullability for field emailothers.
         $dbman->change_field_notnull($table, $field);
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2013112500, 'customdocument');
     }
 
@@ -281,7 +281,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         $sql .= 'where id = (select course from {customdocument} where id = certificateid)) where timedeleted is null';
         $DB->execute($sql);
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         $field = new xmldb_field('haschange', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'coursename');
 
         // Conditionally launch add field haschange.
@@ -292,7 +292,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         $sql = 'UPDATE {customdocument_issues} SET haschange = 1';
         $DB->execute($sql);
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2013112901, 'customdocument');
     }
     // ...v2.1.3.
@@ -391,7 +391,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
             $dbman->drop_field($table, $field);
         }
 
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2014051000, 'customdocument');
     }
 
@@ -434,7 +434,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
                 $pbar->update($count, $countcerts, "Moving Issued certificate files  ($i/$countcerts)");
             }
         }
-        // Simplecertificate savepoint reached.
+        // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2017013001, 'customdocument');
     }
     return true;

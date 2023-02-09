@@ -44,7 +44,7 @@ class backup_customdocument_activity_task extends backup_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // Simplecertificate only has one structure step.
+        // Customdocument only has one structure step.
         $this->add_step(new backup_customdocument_activity_structure_step(
                         'customdocument_structure', 'customdocument.xml'));
     }

@@ -4,7 +4,7 @@
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
 
     <TABLES>
-        <TABLE NAME="customdocument" COMMENT="Simple Certificate" NEXT="customdocument_issues">
+        <TABLE NAME="customdocument" COMMENT="Custom document" NEXT="customdocument_issues">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="course"/>
                 <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>

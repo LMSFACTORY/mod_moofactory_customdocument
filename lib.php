@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple Certificate module core interaction API
+ * Custom Document module core interaction API
  *
  * @package mod
  * @subpackage customdocument

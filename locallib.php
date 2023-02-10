@@ -1434,7 +1434,6 @@ class customdocument {
         if (empty($certtext)) {
             $certtext = $this->get_instance()->certificatetext;
         }
-        $certtext = format_text($certtext, FORMAT_HTML, array('noclean' => true));
 
         $a = new stdClass();
         $a->fullname = strip_tags(fullname($user));
@@ -1560,7 +1559,6 @@ class customdocument {
             $format = $this->get_instance()->certdatefmt;
         }
 
-
         if ($timestart) {
             $a->enrolmenttimestart = userdate($timestart, $format);
         } else {
@@ -1590,10 +1588,13 @@ class customdocument {
             $certtext = str_replace($search, $replace, $certtext);
         }
 
-        // Clear not setted  textmark.
-        $certtext = preg_replace('[\{(.*)\}]', "", $certtext);
+        $certtext = format_text($certtext, FORMAT_HTML, array('noclean' => true));
+
+        // Clear not setted merge fields.
+        // $certtext = preg_replace('[\{(.*)\}]', "", $certtext);
         return $this->remove_links(format_text($certtext, FORMAT_MOODLE));
     }
+
     /**
      * Get the course end date for the user
      */

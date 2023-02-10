@@ -265,7 +265,7 @@ $string['usermoofactorytimedesc'] = "Temps passé en heures et en minutes sur le
 $string['moduleattributiontitle'] = "Attribution dans le cours";
 $string['teachersdesc'] = " Liste des enseignants du cours";
 $string['userroledesc'] = "Rôles de l'utilisateur dans le cours";
-$string['groupnamedesc'] = "Liste des groupes auxquels est inscrit l'apprenant (en ligne, séparer par une virgule)";
+$string['groupnamedesc'] = "Liste des groupes auxquels est inscrit l'apprenant (en ligne, séparés par une virgule)";
 
 // String Certificate/Document Info
 $string['moduleinfotitle'] = "Informations du Document";

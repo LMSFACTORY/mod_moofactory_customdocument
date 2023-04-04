@@ -20,6 +20,8 @@
  * @package    mod
  * @subpackage customdocument
  * @copyright  LMS FACTORY <contact@lmsfactory.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  */
 
 
@@ -225,6 +227,7 @@ $string['modulecoursetitle'] = "Paramètres du cours";
 $string['coursenamedesc'] = "Nom complet du cours";
 $string['coursestartdatedesc'] = "Date du début de cours (paramètres du cours)";
 $string['courseenddatedesc'] = "Date du fin de cours (paramètres du cours)";
+$string['courseversiondesc'] = "Version courante du cours";
 
 //Champs de profil de l'utilisateur
 $string['userprofilefield'] = "Champs de profil de l'utilisateur";
@@ -274,3 +277,20 @@ $string['certcodedesc'] = "Code unique du document";
 $string['formatnotfound'] = "Avertissement: Le plugin 'Format de cours moofactory' est nécessaire";
 $string['formatfound'] = "Le plugin 'Format de cours moofactory' est bien installé. Vous pouvez utiliser pleinement le document personnalisé moofactory. Plus d'information sur la suite <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a> ";
 $string['formatwarning'] = "Avertissement : pour utiliser le champs de fusion {USERMOOFACTORYTIME} vous devez installer le plugin 'Format de cours moofactory'. Plus d'information sur ce plugin : <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a>";
+
+// Validity.
+$string['validity'] = 'Durée de validité du document, en mois.';
+$string['validity_help'] = 'Durée pendant laquelle le document est valide.';
+$string['defaultvalidity'] = 'Durée de validité par défaut du document, en mois.';
+$string['renewalperiod'] = 'Délai de renouvellement du document, en semaines.';
+$string['renewalperiod_help'] = 'Délai pendant lequel l\'utilisateur à la possibilité de renouveler son document. La date de début est calulée en fontion de la durée de validité. À partir de cette date, l\'utilisateur devra à nouveau lever les éventuelles restrictions pour l\'obtention d\'un nouveau document.';
+$string['defaultrenewalperiod'] = 'Délai de renouvellement par défaut du document, en semaines.';
+$string['resetall'] = 'Réinitialiser toutes les activités du cours.';
+$string['resetall_help'] = 'Si cette case est cochée, toutes les activités du cours seront réinitialisées à la date de début de la période de renouvellement (achèvement et note). Dans le cas contraire, seules les activités faisant l\'objet de restrictions pour l\'obtention d\'un nouveau document le seront.';
+$string['expired'] = ' <span class="expired">(périmé)</span>';
+$string['expiredtxt'] = ' (périmé)';
+
+$string['version_category'] = 'Version';
+$string['courseversion'] = 'Version courante du cours';
+
+    

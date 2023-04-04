@@ -37,6 +37,7 @@ $perpage = optional_param('perpage', get_config('customdocument', 'perpage'), PA
 $orderby = optional_param('orderby', 'username', PARAM_RAW);
 $issuelist = optional_param('issuelist', null, PARAM_ALPHA);
 $selectedusers = optional_param_array('selectedusers', null, PARAM_INT);
+$selectedissues = optional_param_array('selectedissues', null, PARAM_INT);
 
 $cm = get_coursemodule_from_id( 'customdocument', $id);
 if (!$cm) {
@@ -103,8 +104,7 @@ switch ($tab) {
         // Verify if user can access this page
         // avoid the access by adding tab=1 in post/get.
         if ($canmanage) {
-
-            $customdocument->view_issued_certificates($url, $selectedusers);
+            $customdocument->view_issued_certificates($url, $selectedissues);
 
         } else {
             print_error('nopermissiontoviewpage');

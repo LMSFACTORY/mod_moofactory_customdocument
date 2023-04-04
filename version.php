@@ -26,12 +26,12 @@
 
 
 defined('MOODLE_INTERNAL') || die();
-$plugin->version  = 2023021000;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2023040200;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2019111800;  // Requires this Moodle version (moodle 3.8.x).
 $plugin->cron     = 4 * 3600;    // Period for cron to check this module (secs).
 $plugin->component = 'mod_customdocument';
 // $plugin->dependencies = array('block_moofactory_estimated_time' => 2021040900);
 
-$plugin->release  = '3.8';     // Human-friendly version name.
+$plugin->release  = '3.11';     // Human-friendly version name.
 // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC, MATURITY_STABLE.
 $plugin->maturity = MATURITY_STABLE;

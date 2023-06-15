@@ -180,7 +180,6 @@ class customdocument {
         // No update if current course version is higher than issue courseversion.
         $courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
         $issuedcerts = $DB->get_records('customdocument_issues', array('certificateid' => $this->get_instance()->id,));
-        // ici
         foreach ($issuedcerts as $issuedcert) {
             if(empty($issuedcert->courseversion) || $courseversion <= $issuedcert->courseversion || $issuedcert->courseversion == "--"){
                 $haschange = 1;
@@ -591,7 +590,6 @@ class customdocument {
      * @param boolean Issue the user certificate if it's not exists (default = true)
      * @return stdClass the issue certificate object
      */
-    // ici
     public function get_issue($user = null, $issueifempty = true) {
         global $DB, $USER;
 
@@ -646,10 +644,31 @@ class customdocument {
 
             $coursectx = context_course::instance($this->get_course()->id);
             $studentroles = array_keys(get_archetype_roles('student'));
-            $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
-            $isnotstudent = empty($students[$userid]);
+            // $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+            // $isnotstudent = empty($students[$userid]);
 
-            if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
+            $alluserroles = get_users_roles($coursectx, array($userid));
+            foreach ($alluserroles[$userid] as $userrole) {
+                $userroleids[] = $userrole->roleid;
+            }
+            $isstudent = false;
+            foreach ($userroleids as $userroleid) {
+                if (in_array($userroleid, $studentroles)) {
+                    // User is in a role that is based on a student archetype on the course.
+                    $isstudent = true;
+                    break;
+                }
+            }
+            // echo("<br><br><br><pre>");
+            // var_dump($studentroles);
+            // var_dump($alluserroles);
+            // var_dump($userroleids);
+            // var_dump($isstudent);
+            // echo("</pre>");
+            // die;
+
+            // if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
+            if (has_capability('mod/customdocument:manage', $this->context, $userid) && !$isstudent) {
                 $issuedcert->id = 0;
             } else {
                 $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
@@ -916,12 +935,11 @@ class customdocument {
     protected function send_alert_email_teachers($issuedcert) {
         $teachers = $this->get_teachers();
         if (!empty($this->get_instance()->emailteachers) && $teachers) {
-                $emailteachers = array();
+            $emailteachers = array();
             foreach ($teachers as $teacher) {
                 $emailteachers[] = $teacher->user->email;
             }
-                $this->send_alert_emails_to_all($emailteachers, $issuedcert);
-
+            $this->send_alert_emails_to_all($emailteachers, $issuedcert);
         }
     }
 
@@ -957,6 +975,16 @@ class customdocument {
             foreach ($emails as $email) {
                 $email = trim($email);
                 if (validate_email($email)) {
+                    $file = $this->get_issue_file($issuedcert);
+                    if ($file) { // Put in a tmp dir, for e-mail attachament.
+                        $fullfilepath = $this->create_temp_file($file->get_filename());
+                        $file->copy_content_to($fullfilepath);
+                        $relativefilepath = str_replace($CFG->dataroot . DIRECTORY_SEPARATOR, "", $fullfilepath);
+            
+                        if (strpos($relativefilepath, DIRECTORY_SEPARATOR, 1) === 0) {
+                            $relativefilepath = substr($relativefilepath, 1);
+                        }
+                    }
                     $destination = new stdClass();
                     $destination->email = $email;
                     $destination->id = rand(-10, -1);
@@ -977,7 +1005,12 @@ class customdocument {
                     $posthtml .= '<p>' . get_string('emailteachermailhtml', 'customdocument', $info) . '</p>';
                     $posthtml .= '</font>';
 
-                    @email_to_user($destination, $from, $postsubject, $posttext, $posthtml); // If it fails, oh well, too bad.
+                    if ($file) {
+                        @email_to_user($destination, $from, $postsubject, $posttext, $posthtml, $relativefilepath, $file->get_filename());
+                    }
+                    else{
+                        @email_to_user($destination, $from, $postsubject, $posttext, $posthtml);
+                    }
                 }// If it fails, oh well, too bad.
             }
         }
@@ -1261,7 +1294,6 @@ class customdocument {
 
             $issuecert->pathnamehash = $file->get_pathnamehash();
 
-            // ici
             $ismanager = has_capability('mod/customdocument:manage', $this->context, $issuecert->userid);
             if(!$ismanager){
                 // Insert courant course version.
@@ -1562,7 +1594,9 @@ class customdocument {
         // Merge field for the name of the groups in which the user is registered.
         $a->groupNames = $this->getGroupData($user->id);
         // Merge field for the moofactory time spent given by the statistics settings in the course management.
-        $a->usermoofactorytime = $this->get_moofactory_timespent($user->id);
+        if(!is_siteadmin($user)){
+            $a->usermoofactorytime = $this->get_moofactory_timespent($user->id);
+        }
         // Merge field for the first user access to the course.
         $a->coursefirstaccess = $this->get_first_user_access($user->id);
         // Merge field for the last user access to the course.
@@ -1820,11 +1854,12 @@ class customdocument {
         // Get course id
         $courseid = $this->get_course()->id;
         // Prepare sql query to get the created time value from the database based on the user id and course id
-        $sql = "SELECT timecreated FROM {logstore_standard_log} WHERE userid = :userid AND courseid = :courseid ORDER BY timecreated ASC LIMIT 1";
+        $sql = "SELECT timecreated FROM {logstore_standard_log} WHERE userid = :userid AND courseid = :courseid ORDER BY timecreated ASC";
         // Defining the parameters of the query
         $params = array('userid' => $userid, 'courseid' => $courseid);
         // Executing the query
-        $record = $DB->get_field_sql($sql, $params);
+        $records = $DB->get_records_sql($sql, $params);
+        $record = array_key_first($records);
 
         if (empty($this->get_instance()->certdatefmt)) {
             $format = get_string('strftimedate', 'langconfig');
@@ -2380,7 +2415,6 @@ class customdocument {
             echo $OUTPUT->footer();
 
         } else { // Output to pdf.
-            // ici
             if ($this->get_instance()->delivery != 3 || $canmanage) {
                 $this->output_pdf($this->get_issue($USER));
             }
@@ -2779,6 +2813,7 @@ class customdocument {
 
         $pagestart = intval($page * $perpage);
         $usercount = 0;
+        $users = array();
         if (!$selectedusers) {
             // Seuls les users ayant accès au certificat sont pris en compte
             $enrolledusers = get_enrolled_users($coursectx, '', $groupid);

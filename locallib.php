@@ -1899,6 +1899,7 @@ class customdocument {
         $groupData = array_values($groupData);
 
         // looping through the array and getting the string (groupname)
+        $groupName = array();
         for ($i=0; $i < count($groupData); $i++) {
             $groupName[] = $groupData[$i]->groupname;
         }

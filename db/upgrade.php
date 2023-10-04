@@ -30,22 +30,13 @@
 //
 // The commands in here will all be database-neutral,
 // using the functions defined in lib/ddllib.php.
-
-/**
- *
- * @package    mod
- * @subpackage customdocument
- * @copyright  LMS FACTORY <contact@lmsfactory.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- */
-
- defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
 
 function xmldb_customdocument_upgrade($oldversion = 0) {
     global $DB;
     $dbman = $DB->get_manager();
+
 
     if ($oldversion < 2013053102) {
 
@@ -445,84 +436,6 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         }
         // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2017013001, 'customdocument');
-    }
-
-    if ($oldversion < 2023032202) {
-        $table = new xmldb_table('customdocument');
-
-        $field = new xmldb_field('validity', XMLDB_TYPE_INTEGER, '4', null, null, null, '12', 'timestartdatefmt');
-
-        // Conditionally launch add field validity.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $field = new xmldb_field('renewalperiod', XMLDB_TYPE_INTEGER, '4', null, null, null, '2', 'validity');
-
-        // Conditionally launch add field renewalperiod.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $field = new xmldb_field('resetall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'renewalperiod');
-
-        // Conditionally launch add field resetall.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        
-        $table = new xmldb_table('customdocument_issues');
-
-        $field = new xmldb_field('timedisabled', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timedeleted');
-
-        // Conditionally launch add field validity.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $field = new xmldb_field('courseversion', XMLDB_TYPE_CHAR, '40', null, null, null, null, 'coursename');
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Creation of the course custom fields in the 'Version' category.
-        $categoryid = $DB->get_field('customfield_category', 'id', array('name' => get_string('version_category', 'customdocument')));
-
-        if(empty($categoryid)){
-            $handler = core_course\customfield\course_handler::create();
-            $categoryid = $handler->create_category(get_string('version_category', 'customdocument'));
-        }
-
-        if ($categoryid) {
-            $category = \core_customfield\category_controller::create($categoryid);
-
-            // 'Current version' field.
-            $id = $DB->get_field('customfield_field', 'id', array('shortname' => 'courseversion'));
-            if(empty($id)){
-                $type = "text";
-                $field = \core_customfield\field_controller::create(0, (object)['type' => $type], $category);
-
-                $handler = $field->get_handler();
-                if (!$handler->can_configure()) {
-                    print_error('nopermissionconfigure', 'core_customfield');
-                }
-
-                $data = new stdClass();
-                $data->name = get_string('courseversion', 'customdocument');
-                $data->shortname = 'courseversion';
-                $data->configdata = array("required" => "0", "uniquevalues" => "0", "defaultvalue" => "", "displaysize" => 10, "maxlength" => 40, "ispassword" => "0", "link" => "",  "locked" => "0",  "visibility" => "2");
-                $data->mform_isexpanded_id_header_specificsettings = 1;
-                $data->mform_isexpanded_id_course_handler_header = 1;
-                $data->categoryid = $categoryid;
-                $data->type = $type;
-                $data->id = 0;
-        
-                $handler->save_field_configuration($field, $data);
-            }
-        }
-
-        // Customdocument savepoint reached.
-        upgrade_mod_savepoint(true, 2023032202, 'customdocument');
     }
     return true;
 }

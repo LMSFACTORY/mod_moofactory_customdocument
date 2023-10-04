@@ -32,14 +32,12 @@ require_once($CFG->dirroot . '/grade/lib.php');
 require_once($CFG->dirroot . '/grade/querylib.php');
 require_once($CFG->libdir . '/pdflib.php');
 require_once($CFG->dirroot . '/user/profile/lib.php');
-require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
 
 use core_availability\info;
 use core_availability\info_module;
 use core\message\inbound\private_files_handler;
 use core_table\external\dynamic\get;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
-use setasign\Fpdi\TcpdfFpdi;
 
 
 class customdocument {
@@ -170,30 +168,19 @@ class customdocument {
      * @return bool false if an error occurs
      */
     public function update_instance(stdClass $formdata) {
-        global $USER, $DB;
+        global $DB;
 
         $update = $this->populate_customdocument_instance($formdata);
         $update->timemodified = time();
 
         $result = $DB->update_record('customdocument', $update);
 
-        // No update if current course version is higher than issue courseversion.
-        $courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
-        $issuedcerts = $DB->get_records('customdocument_issues', array('certificateid' => $this->get_instance()->id,));
-        foreach ($issuedcerts as $issuedcert) {
-            if(empty($issuedcert->courseversion) || $courseversion <= $issuedcert->courseversion || $issuedcert->courseversion == "--"){
-                $haschange = 1;
-            }
-            else{
-                $haschange = 0;
-            }
-            if (!$DB->execute(
-                            'UPDATE {customdocument_issues} SET haschange = :haschange WHERE timedeleted is NULL AND timedisabled is NULL AND id = :issuedcertid',
-                            array('haschange' => $haschange, 'issuedcertid' => $issuedcert->id))) {
-                print_error('cannotupdatemod', '', '', self::CERTIFICATE_COMPONENT_NAME,
-                            'Error update customdocument, markig issues
-                        with has change');
-            }
+        if (!$DB->execute(
+                        'UPDATE {customdocument_issues} SET haschange = 1 WHERE timedeleted is NULL AND certificateid = :certid',
+                        array('certid' => $this->get_instance()->id))) {
+            print_error('cannotupdatemod', '', '', self::CERTIFICATE_COMPONENT_NAME,
+                        'Error update customdocument, markig issues
+                     with has change');
         }
 
         $this->instance = $DB->get_record('customdocument', array('id' => $update->id), '*', MUST_EXIST);
@@ -587,7 +574,7 @@ class customdocument {
      * Get issued certificate object, if it's not exist, it will be create
      *
      * @param mixed User obj or id
-     * @param boolean Issue the user certificate if it's not exists (default = true)
+     * @param boolean Issue teh user certificate if it's not exists (default = true)
      * @return stdClass the issue certificate object
      */
     public function get_issue($user = null, $issueifempty = true) {
@@ -613,13 +600,12 @@ class customdocument {
                 // ...haschange is marked, if no return from cache.
                 return $this->issuecert;
             } else {
-                // ...haschange is marked, must update.
+                // ...haschange is maked, must update.
                 $issuedcert = $this->issuecert;
             }
             // Not in cache, trying get from database.
         } else if (!$issuedcert = $DB->get_record('customdocument_issues',
-                        array('userid' => $userid, 'certificateid' => $this->get_instance()->id, 'timedeleted' => null, 'timedisabled' => null))) {
-                        // array('userid' => $userid, 'certificateid' => $this->get_instance()->id, 'timedeleted' => null))) {
+                        array('userid' => $userid, 'certificateid' => $this->get_instance()->id, 'timedeleted' => null))) {
             // Not in cache and not in DB, create new certificate issue record.
 
             if (!$issueifempty) {
@@ -644,31 +630,10 @@ class customdocument {
 
             $coursectx = context_course::instance($this->get_course()->id);
             $studentroles = array_keys(get_archetype_roles('student'));
-            // $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
-            // $isnotstudent = empty($students[$userid]);
+            $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+            $isnotstudent = empty($students[$userid]);
 
-            $alluserroles = get_users_roles($coursectx, array($userid));
-            foreach ($alluserroles[$userid] as $userrole) {
-                $userroleids[] = $userrole->roleid;
-            }
-            $isstudent = false;
-            foreach ($userroleids as $userroleid) {
-                if (in_array($userroleid, $studentroles)) {
-                    // User is in a role that is based on a student archetype on the course.
-                    $isstudent = true;
-                    break;
-                }
-            }
-            // echo("<br><br><br><pre>");
-            // var_dump($studentroles);
-            // var_dump($alluserroles);
-            // var_dump($userroleids);
-            // var_dump($isstudent);
-            // echo("</pre>");
-            // die;
-
-            // if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
-            if (has_capability('mod/customdocument:manage', $this->context, $userid) && !$isstudent) {
+            if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
                 $issuedcert->id = 0;
             } else {
                 $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
@@ -709,7 +674,7 @@ class customdocument {
         $sql = "SELECT *
                 FROM {customdocument_issues} i
                 WHERE certificateid = :certificateid
-                AND userid = :userid AND timedeleted IS NULL AND timedisabled IS NULL";
+                AND userid = :userid AND timedeleted IS NULL";
 
         $issues = $DB->get_records_sql($sql, array('certificateid' => $this->get_instance()->id, 'userid' => $USER->id));
         if ($issues) {
@@ -935,11 +900,12 @@ class customdocument {
     protected function send_alert_email_teachers($issuedcert) {
         $teachers = $this->get_teachers();
         if (!empty($this->get_instance()->emailteachers) && $teachers) {
-            $emailteachers = array();
+                $emailteachers = array();
             foreach ($teachers as $teacher) {
                 $emailteachers[] = $teacher->user->email;
             }
-            $this->send_alert_emails_to_all($emailteachers, $issuedcert);
+                $this->send_alert_emails_to_all($emailteachers, $issuedcert);
+
         }
     }
 
@@ -956,8 +922,7 @@ class customdocument {
             }
         }
     }
-
-    /**
+ /**
      * Send Alerts email of received certificates
      * despite of teacher and student. It is the corrected version of the send_alert_emails()
      * which had errors.
@@ -975,16 +940,6 @@ class customdocument {
             foreach ($emails as $email) {
                 $email = trim($email);
                 if (validate_email($email)) {
-                    $file = $this->get_issue_file($issuedcert);
-                    if ($file) { // Put in a tmp dir, for e-mail attachament.
-                        $fullfilepath = $this->create_temp_file($file->get_filename());
-                        $file->copy_content_to($fullfilepath);
-                        $relativefilepath = str_replace($CFG->dataroot . DIRECTORY_SEPARATOR, "", $fullfilepath);
-            
-                        if (strpos($relativefilepath, DIRECTORY_SEPARATOR, 1) === 0) {
-                            $relativefilepath = substr($relativefilepath, 1);
-                        }
-                    }
                     $destination = new stdClass();
                     $destination->email = $email;
                     $destination->id = rand(-10, -1);
@@ -1005,12 +960,7 @@ class customdocument {
                     $posthtml .= '<p>' . get_string('emailteachermailhtml', 'customdocument', $info) . '</p>';
                     $posthtml .= '</font>';
 
-                    if ($file) {
-                        @email_to_user($destination, $from, $postsubject, $posttext, $posthtml, $relativefilepath, $file->get_filename());
-                    }
-                    else{
-                        @email_to_user($destination, $from, $postsubject, $posttext, $posthtml);
-                    }
+                    @email_to_user($destination, $from, $postsubject, $posttext, $posthtml); // If it fails, oh well, too bad.
                 }// If it fails, oh well, too bad.
             }
         }
@@ -1077,7 +1027,7 @@ class customdocument {
         $keywords = str_replace(",", " ", $keywords); // Replace commas with spaces.
         $keywords = str_replace("  ", " ", $keywords); // Replace two spaces with one.
 
-        $pdf = new TcpdfFpdi($orientation, 'mm', array($this->get_instance()->width, $this->get_instance()->height), true, 'UTF-8');
+        $pdf = new pdf($orientation, 'mm', array($this->get_instance()->width, $this->get_instance()->height), true, 'UTF-8');
         $pdf->SetTitle($this->get_instance()->name);
         $pdf->SetSubject($this->get_instance()->name . ' - ' . $this->get_instance()->coursename);
         $pdf->SetKeywords($keywords);
@@ -1111,90 +1061,76 @@ class customdocument {
             $pdf = $this->create_pdf_object();
         }
 
-        
-        // Getting certificate image.
+        $pdf->AddPage();
+
+        // Getting certificare image.
         $fs = get_file_storage();
-        
-        if($isbulk && !empty($issuecert->pathnamehash && empty($issuecert->haschange))){
-            $file = $fs->get_file_by_hash($issuecert->pathnamehash);
-            
-            $tmpfile = $file->copy_content_to_temp();
-            $pageCount = $pdf->setSourceFile($tmpfile);
-            for ($i = 0; $i < $pageCount; $i++) {
-                $tpl = $pdf->importPage($i + 1, '/MediaBox');
-                $pdf->addPage();
-                $pdf->useTemplate($tpl);
+
+        // Get first page image file.
+        if (!empty($this->get_instance()->certificateimage)) {
+            // Prepare file record object.
+            $fileinfo = self::get_certificate_image_fileinfo($this->context->id);
+
+            $firstpageimagefile = $fs->get_file($fileinfo['contextid'], $fileinfo['component'],
+                            $fileinfo['filearea'],
+                            $fileinfo['itemid'], $fileinfo['filepath'],
+                            $this->get_instance()->certificateimage);
+
+            // Read contents.
+            if ($firstpageimagefile) {
+                $tmpfilename = $firstpageimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'first_image_');
+                $pdf->Image($tmpfilename, 0, 0, $this->get_instance()->width, $this->get_instance()->height);
+                @unlink($tmpfilename);
+            } else {
+                print_error(get_string('filenotfound', 'customdocument', $this->get_instance()->certificateimage));
             }
         }
-        else{
+
+        // Writing text.
+        $pdf->SetXY($this->get_instance()->certificatetextx, $this->get_instance()->certificatetexty);
+        $certTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->certificatetext);
+
+        $pdf->writeHTMLCell(0, 0, '', '', $certTextVar , 0, 0, 0,
+                            true, 'C');
+
+        // Print QR code in first page (if enable).
+        if (!empty($this->get_instance()->qrcodefirstpage) && !empty($this->get_instance()->printqrcode)) {
+            $this->print_qrcode($pdf, $issuecert->code);
+        }
+
+        if (!empty($this->get_instance()->enablesecondpage)) {
             $pdf->AddPage();
-
-            // Get first page image file.
-            if (!empty($this->get_instance()->certificateimage)) {
+            if (!empty($this->get_instance()->secondimage)) {
                 // Prepare file record object.
-                $fileinfo = self::get_certificate_image_fileinfo($this->context->id);
-
-                $firstpageimagefile = $fs->get_file($fileinfo['contextid'], $fileinfo['component'],
-                                $fileinfo['filearea'],
-                                $fileinfo['itemid'], $fileinfo['filepath'],
-                                $this->get_instance()->certificateimage);
+                $fileinfo = self::get_certificate_secondimage_fileinfo($this->context->id);
+                // Get file.
+                $secondimagefile = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                                                $fileinfo['itemid'], $fileinfo['filepath'], $this->get_instance()->secondimage);
 
                 // Read contents.
-                if ($firstpageimagefile) {
-                    $tmpfilename = $firstpageimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'first_image_');
+                if (!empty($secondimagefile)) {
+                    $tmpfilename = $secondimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'second_image_');
                     $pdf->Image($tmpfilename, 0, 0, $this->get_instance()->width, $this->get_instance()->height);
                     @unlink($tmpfilename);
                 } else {
-                    print_error(get_string('filenotfound', 'customdocument', $this->get_instance()->certificateimage));
+                    print_error(get_string('filenotfound', 'customdocument', $this->get_instance()->secondimage));
                 }
             }
-
-            // Writing text.
-            $pdf->SetXY($this->get_instance()->certificatetextx, $this->get_instance()->certificatetexty);
-            $certTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->certificatetext);
-
-            $pdf->writeHTMLCell(0, 0, '', '', $certTextVar , 0, 0, 0,
-                                true, 'C');
-
-            // Print QR code in first page (if enable).
-            if (!empty($this->get_instance()->qrcodefirstpage) && !empty($this->get_instance()->printqrcode)) {
-                $this->print_qrcode($pdf, $issuecert->code);
+            if (!empty($this->get_instance()->secondpagetext)) {
+                $pdf->SetXY($this->get_instance()->secondpagex, $this->get_instance()->secondpagey);
+                $pdf->writeHTMLCell(0, 0, '', '', $this->get_certificate_text($issuecert, $this->get_instance()->secondpagetext), 0,
+                                    0, 0, true, 'C');
             }
+        }
 
-            if (!empty($this->get_instance()->enablesecondpage)) {
+        if (!empty($this->get_instance()->printqrcode) && empty($this->get_instance()->qrcodefirstpage)) {
+            // Add certificade code using QRcode, in a new page (to print in the back).
+            if (empty($this->get_instance()->enablesecondpage)) {
+                // If secondpage is disabled, create one.
                 $pdf->AddPage();
-                if (!empty($this->get_instance()->secondimage)) {
-                    // Prepare file record object.
-                    $fileinfo = self::get_certificate_secondimage_fileinfo($this->context->id);
-                    // Get file.
-                    $secondimagefile = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
-                                                    $fileinfo['itemid'], $fileinfo['filepath'], $this->get_instance()->secondimage);
-
-                    // Read contents.
-                    if (!empty($secondimagefile)) {
-                        $tmpfilename = $secondimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'second_image_');
-                        $pdf->Image($tmpfilename, 0, 0, $this->get_instance()->width, $this->get_instance()->height);
-                        @unlink($tmpfilename);
-                    } else {
-                        print_error(get_string('filenotfound', 'customdocument', $this->get_instance()->secondimage));
-                    }
-                }
-                if (!empty($this->get_instance()->secondpagetext)) {
-                    $pdf->SetXY($this->get_instance()->secondpagex, $this->get_instance()->secondpagey);
-                    $pdf->writeHTMLCell(0, 0, '', '', $this->get_certificate_text($issuecert, $this->get_instance()->secondpagetext), 0,
-                                        0, 0, true, 'C');
-                }
             }
+            $this->print_qrcode($pdf, $issuecert->code);
 
-            if (!empty($this->get_instance()->printqrcode) && empty($this->get_instance()->qrcodefirstpage)) {
-                // Add certificade code using QRcode, in a new page (to print in the back).
-                if (empty($this->get_instance()->enablesecondpage)) {
-                    // If secondpage is disabled, create one.
-                    $pdf->AddPage();
-                }
-                $this->print_qrcode($pdf, $issuecert->code);
-
-            }
         }
 
         return $pdf;
@@ -1294,16 +1230,6 @@ class customdocument {
 
             $issuecert->pathnamehash = $file->get_pathnamehash();
 
-            $ismanager = has_capability('mod/customdocument:manage', $this->context, $issuecert->userid);
-            if(!$ismanager){
-                // Insert courant course version.
-                $courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
-            }
-            else{
-                $courseversion = "--";
-            }
-            $issuecert->courseversion = $courseversion;
-
             $coursectx = context_course::instance($this->get_course()->id);
             $studentroles = array_keys(get_archetype_roles('student'));
             $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
@@ -1317,28 +1243,6 @@ class customdocument {
             }
             return $file;
         }
-    }
-
-    protected function getCustomfield($courseid, $name, $type){
-        global $DB;
-    
-        switch($type){
-            case "select" :
-            case "checkbox" :
-                $fieldvalue = "intvalue";
-                break;
-            case "text" :
-                $fieldvalue = "charvalue";
-                break;
-            }
-        $sql = "SELECT cd.$fieldvalue FROM {customfield_data} cd ";
-        $sql .= "LEFT JOIN {customfield_field} cf ON cf.id = cd.fieldid ";
-        $sql .= "WHERE cd.instanceid = ? AND cf.shortname = ?";
-        $record = $DB->get_record_sql(
-            $sql,
-            array($courseid, $name));
-        $value = $record->$fieldvalue;
-        return $value;
     }
 
     /**
@@ -1530,6 +1434,7 @@ class customdocument {
         if (empty($certtext)) {
             $certtext = $this->get_instance()->certificatetext;
         }
+        $certtext = format_text($certtext, FORMAT_HTML, array('noclean' => true));
 
         $a = new stdClass();
         $a->fullname = strip_tags(fullname($user));
@@ -1583,30 +1488,28 @@ class customdocument {
         $a->outcome = $this->get_outcome($user->id);
         $a->certificatecode = $issuecert->code;
 
-        // NOTE: Each function for all the merge fields is defined below.
+        // NOTE: chaque fonctionne pour toues les champs fusion est definir en bas
+        // NOTE: Each function for all the fields is defined below
 
-        // Merge field for deliverance date.
+        // champs fusion pour la deliverance date
         $a->deliverancedate = $this->date_deliverance($issuecert);
-        // Merge field for course start date.
+        // champs fusion pour la date de debut de course
         $a->coursestartdate = $this->course_start_date($issuecert, $user->id);
-        // Merge field for course end date.
+        // champs fusion pour la date de fin de course
         $a->courseenddate = $this->course_end_date($issuecert, $user->id);
-        // Merge field for the name of the groups in which the user is registered.
+        // champs fusion pour les noms de groups dans quel l'utilisateur est inscrir
         $a->groupNames = $this->getGroupData($user->id);
-        // Merge field for the moofactory time spent given by the statistics settings in the course management.
-        if(!is_siteadmin($user)){
-            $a->usermoofactorytime = $this->get_moofactory_timespent($user->id);
-        }
-        // Merge field for the first user access to the course.
+        // champs fusion pour la tempsfoomactory effecté par
+        // les parametrages des statistiques dans la getions de cours
+        $a->usermoofactorytime = $this->get_moofactory_timespent( $user->id);
+        // champs fusion pour la premier access de la course par l'utilisateur
         $a->coursefirstaccess = $this->get_first_user_access($user->id);
-        // Merge field for the last user access to the course.
+        // champs fusion pour la derniere access de la course par l'utilisateur
         $a->courselastaccess = $this->get_last_user_access($user->id);
-        // Merge field for user enrol date to the course.
+        // chamsp fusion pour la date d'inscription pour l'utilisateur dans le course
         $a->enrolmenttimeend = $this->get_user_inscription_time_end($user->id);
-        // Merge field for the user course completion date.
+        // chamsp fusion pour la date de termination/fin pour l'utilisateur dans le course
         $a->coursecompletiondate = $this->get_course_completion_date($user->id);
-        // Merge field for the course version.
-        $a->courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
 
 
         // This code stay here only beace legacy support, coursehours variable was removed
@@ -1657,6 +1560,7 @@ class customdocument {
             $format = $this->get_instance()->certdatefmt;
         }
 
+
         if ($timestart) {
             $a->enrolmenttimestart = userdate($timestart, $format);
         } else {
@@ -1686,13 +1590,10 @@ class customdocument {
             $certtext = str_replace($search, $replace, $certtext);
         }
 
-        $certtext = format_text($certtext, FORMAT_HTML, array('noclean' => true));
-
-        // Clear not setted merge fields.
-        // $certtext = preg_replace('[\{(.*)\}]', "", $certtext);
+        // Clear not setted  textmark.
+        $certtext = preg_replace('[\{(.*)\}]', "", $certtext);
         return $this->remove_links(format_text($certtext, FORMAT_MOODLE));
     }
-
     /**
      * Get the course end date for the user
      */
@@ -1854,12 +1755,11 @@ class customdocument {
         // Get course id
         $courseid = $this->get_course()->id;
         // Prepare sql query to get the created time value from the database based on the user id and course id
-        $sql = "SELECT timecreated FROM {logstore_standard_log} WHERE userid = :userid AND courseid = :courseid ORDER BY timecreated ASC";
+        $sql = "SELECT timecreated FROM {logstore_standard_log} WHERE userid = :userid AND courseid = :courseid ORDER BY timecreated ASC LIMIT 1";
         // Defining the parameters of the query
         $params = array('userid' => $userid, 'courseid' => $courseid);
         // Executing the query
-        $records = $DB->get_records_sql($sql, $params);
-        $record = array_key_first($records);
+        $record = $DB->get_field_sql($sql, $params);
 
         if (empty($this->get_instance()->certdatefmt)) {
             $format = get_string('strftimedate', 'langconfig');
@@ -1899,7 +1799,6 @@ class customdocument {
         $groupData = array_values($groupData);
 
         // looping through the array and getting the string (groupname)
-        $groupName = array();
         for ($i=0; $i < count($groupData); $i++) {
             $groupName[] = $groupData[$i]->groupname;
         }
@@ -2104,6 +2003,37 @@ class customdocument {
 
         }
 
+        // Set to current time.
+        // $date = time();
+
+        // Set certificate issued date.
+        // if ($this->get_instance()->certdate == self::CERT_ISSUE_DATE) {
+        //     $date = $issuecert->timecreated;
+        // }
+
+        // // Get the course start date.
+        // if ($this->get_instance()->certdate == self::COURSE_START_DATE) {
+        //     $sql = "SELECT id, startdate FROM {course} c
+        //       WHERE c.id = :courseid";
+
+        //     $coursestartdate = $DB->get_record_sql($sql, array('courseid' => $this->get_course()->id));
+        //     $date = $coursestartdate->startdate;
+        // }
+
+        // // Get the enrolment end date.
+        // if ($this->get_instance()->certdate == self::COURSE_COMPLETATION_DATE) {
+        //     $sql = "SELECT MAX(c.timecompleted) as timecompleted FROM {course_completions} c
+        //          WHERE c.userid = :userid AND c.course = :courseid";
+
+        //     $timecompleted = $DB->get_record_sql($sql, array('userid' => $issuecert->userid,
+        //                     'courseid' => $this->get_course()->id));
+
+
+        //     if ($timecompleted && !empty($timecompleted->timecompleted)) {
+        //         $date = $timecompleted->timecompleted;
+        //     }
+            // Get the module grade date.
+        // }
         if ($this->get_instance()->certdate > 0
             && $modinfo = $this->get_mod_grade($this->get_instance()->certdate, $issuecert->userid)) {
                 $moduleid = $this->get_instance()->certdate;
@@ -2423,10 +2353,10 @@ class customdocument {
     }
 
     protected function get_issued_certificate_users($sort = 'username', $groupmode = 0) {
-        global $CFG, $DB, $SESSION;
+        global $CFG, $DB;
 
         if ($sort == 'username') {
-            $sort = $DB->sql_fullname() . ' ASC, ci.timecreated ASC';
+            $sort = $DB->sql_fullname() . ' ASC';
         } else if ($sort == 'issuedate') {
             $sort = 'ci.timecreated ASC';
         } else {
@@ -2436,7 +2366,7 @@ class customdocument {
         // Get all users that can manage this certificate to exclude them from the report.
         $certmanagers = get_users_by_capability($this->context, 'mod/customdocument:manage', 'u.id');
 
-        $sql = "SELECT ci.code, ci.id AS ciid, ci.timecreated, ci.timedisabled, ci.haschange, ci.pathnamehash, u.id, u.firstname, u.lastname ";
+        $sql = "SELECT u.*, ci.code, ci.timecreated ";
         $sql .= "FROM {user} u INNER JOIN {customdocument_issues} ci ON u.id = ci.userid ";
         $sql .= "WHERE u.deleted = 0 AND ci.certificateid = :certificateid AND timedeleted IS NULL ";
         $sql .= "ORDER BY {$sort}";
@@ -2444,7 +2374,7 @@ class customdocument {
 
         // Now exclude all the certmanagers.
         foreach ($issedusers as $id => $user) {
-            if (!empty($certmanagers[$user->id])) { // Exclude certmanagers.
+            if (!empty($certmanagers[$id])) { // Exclude certmanagers.
                 unset ($issedusers[$id]);
             }
         }
@@ -2454,29 +2384,33 @@ class customdocument {
             && $groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
             $issedusers = array_intersect($issedusers, array_keys($groupingusers));
         }
+
         if ($groupmode) {
-            $currentgroup = groups_get_activity_group($this->coursemodule, true);
+            $currentgroup = groups_get_activity_group($this->coursemodule);
             if ($currentgroup) {
                 $groupusers = groups_get_members($currentgroup, 'u.*');
                 if (empty($groupusers)) {
                     return array();
                 }
-                foreach ($issedusers as $isseduser) {
-                    if (empty($groupusers[$isseduser->id])) {
+                foreach ($issedusers as $id => $unused) {
+                    if (empty($groupusers[$id])) {
                         // Remove this user as it isn't in the group!
-                        unset($issedusers[$isseduser->code]);
+                        unset($issedusers[$id]);
                     }
                 }
             }
         }
         return $issedusers;
     }
-    // theCodeman
+// theCodeman
     // Issued certificates view.
     public function view_issued_certificates(moodle_url $url, array $selectedusers = null) {
         global $OUTPUT, $CFG, $DB, $PAGE;
 
         // Declare some variables.
+        $strto = html_writer::link($url->out(false, array('orderby' => 'username')), get_string('awardedto', 'customdocument'));
+        // $strdate = html_writer::link($url->out(false, array('orderby' => 'issuedate')),
+        //                             get_string('receiveddate', 'customdocument'));
         $strdate = get_string('receptiondate', 'customdocument');
         $strgrade = get_string('grade', 'customdocument');
         $strcode = get_string('code', 'customdocument');
@@ -2492,10 +2426,21 @@ class customdocument {
             $users = $this->get_issued_certificate_users($orderby, $groupmode);
             $usercount = count($users);
         } else {
-            list($sqlissueids, $params) = $DB->get_in_or_equal($selectedusers);
-            $sql = "SELECT * FROM {customdocument_issues} WHERE id $sqlissueids";
-
-            $issues = $DB->get_records_sql($sql, $params);
+            list($sqluserids, $params) = $DB->get_in_or_equal($selectedusers);
+            $sql = "SELECT * FROM {user} WHERE id $sqluserids";
+            // Adding sort.
+            $sort = '';
+            $override = new stdClass();
+            $override->firstname = 'firstname';
+            $override->lastname = 'lastname';
+            $fullnamelanguage = get_string('fullnamedisplay', '', $override);
+            if (($CFG->fullnamedisplay == 'firstname lastname') || ($CFG->fullnamedisplay == 'firstname') ||
+            ($CFG->fullnamedisplay == 'language' && $fullnamelanguage == 'firstname lastname')) {
+                $sort = " ORDER BY firstname, lastname";
+            } else {
+                $sort = " ORDER BY lastname, firstname";
+            }
+            $users = $DB->get_records_sql($sql . $sort, $params);
         }
 
         if (!$action) {
@@ -2529,6 +2474,7 @@ class customdocument {
             $table->width = "95%";
             $table->tablealign = "center";
             $selectAllchkBox = html_writer::checkbox('selectallusersdocuments', '',false);
+            // $strto
             $table->head = array($selectAllchkBox, get_string('firstname', 'customdocument'), get_string('lastname', 'customdocument'),$strdate, $strgrade, $strcode);
             $table->align = array("left", "left", "left", "center", "center");
             $table->size = array('1%', '15%', '15%' ,'25%', '5%', '30%');
@@ -2536,24 +2482,11 @@ class customdocument {
             $users = array_slice($users, intval($page * $perpage), $perpage);
 
             foreach ($users as $user) {
-                $usercert = $this->get_issue($user, false);
-                $usercert->id = $user->ciid;
-                $usercert->userid = $user->id;
-                $usercert->code = $user->code;
-                $usercert->timecreated = $user->timecreated;
-                $usercert->haschange = $user->haschange;
-                $usercert->pathnamehash = $user->pathnamehash;
+                $usercert = $this->get_issue($user);
                 $name = $OUTPUT->user_picture($user) . $user->firstname;
                 $lastname = $user->lastname;
-                $chkbox = html_writer::checkbox('selectedissues[]', $user->ciid, false);
-                if($user->timedisabled){
-                    $date = '<span class="hidden">' . date("Y-m-d H:i:s", $usercert->timecreated) . '</span>' . userdate($usercert->timecreated) . get_string('expired', 'customdocument') . customdocument_print_issue_certificate_file($usercert);
-                    $table->rowclasses[] = "disabled";
-                }
-                else{
-                    $date =  '<span class="hidden">' . date("Y-m-d H:i:s", $usercert->timecreated) . '</span>' . userdate($usercert->timecreated) . customdocument_print_issue_certificate_file($usercert);  
-                    $table->rowclasses[] = "";
-                }
+                $chkbox = html_writer::checkbox('selectedusers[]', $user->id, false);
+                $date = userdate($usercert->timecreated) . customdocument_print_issue_certificate_file($usercert);
                 $code = $user->code;
                 $table->data[] = array($chkbox, $name, $lastname ,$date, $this->get_grade($user->id), $code);
             }
@@ -2604,22 +2537,20 @@ class customdocument {
                     switch ($type) {
                         case  'all':
                             // Override $users param, if there is a selected users, but it clicks on delete all.
-                            $issues = $users;
-                            foreach ($issues as $issuedcert) {
-                                $issuedcert->userid = $issuedcert->id;
-                                $issuedcert->id = $issuedcert->ciid;
+                            if ($selectedusers) {
+                                $users = $this->get_issued_certificate_users($orderby, $groupmode);
                             }
                         break;
 
                         case 'selected':
                             // No user selected, add an empty array to avoid errors.
                             if (!$selectedusers) {
-                                $issues = array();
+                                $users = array();
                             }
                         break;
                     }
-
-                    foreach ($issues as $issuedcert) {
+                    foreach ($users as $user) {
+                        $issuedcert = $this->get_issue($user);
                         // If it's issued, then i remove.
                         if ($issuedcert) {
                             $this->remove_issue($issuedcert, false);
@@ -2673,12 +2604,7 @@ class customdocument {
                                         }
                                     }
                                     $myxls->write_string($row, 2, $ug2);
-                                    if($user->timedisabled){
-                                        $myxls->write_string($row, 3, userdate($user->timecreated) . get_string('expiredtxt', 'customdocument'));
-                                    }
-                                    else{
-                                        $myxls->write_string($row, 3, userdate($user->timecreated));
-                                    }
+                                    $myxls->write_string($row, 3, userdate($user->timecreated));
                                     $myxls->write_string($row, 4, $this->get_grade($user->id));
                                     $myxls->write_string($row, 5, $user->code);
                                     $row++;
@@ -2723,12 +2649,7 @@ class customdocument {
                                         }
                                     }
                                     $myxls->write_string($row, 2, $ug2);
-                                    if($user->timedisabled){
-                                        $myxls->write_string($row, 3, userdate($user->timecreated) . get_string('expiredtxt', 'customdocument'));
-                                    }
-                                    else{
-                                        $myxls->write_string($row, 3, userdate($user->timecreated));
-                                    }
+                                    $myxls->write_string($row, 3, userdate($user->timecreated));
                                     $myxls->write_string($row, 4, $this->get_grade($user->id));
                                     $myxls->write_string($row, 5, $user->code);
                                     $row++;
@@ -2774,12 +2695,7 @@ class customdocument {
                                         }
                                     }
                                     echo $ug2 . "\t";
-                                    if($user->timedisabled){
-                                        echo userdate($user->timecreated) . get_string('expiredtxt', 'customdocument') . "\t";
-                                    }
-                                    else{
-                                        echo userdate($user->timecreated) . "\t";
-                                    }
+                                    echo userdate($user->timecreated) . "\t";
                                     echo $this->get_grade($user->id) . "\t";
                                     echo $user->code . "\n";
                                     $row++;
@@ -2814,7 +2730,6 @@ class customdocument {
 
         $pagestart = intval($page * $perpage);
         $usercount = 0;
-        $users = array();
         if (!$selectedusers) {
             // Seuls les users ayant accès au certificat sont pris en compte
             $enrolledusers = get_enrolled_users($coursectx, '', $groupid);
@@ -2842,6 +2757,7 @@ class customdocument {
                 $sort = " ORDER BY lastname, firstname";
             }
             $users = $DB->get_records_sql($sql . $sort, $params);
+
         }
 
         if (!$action) {
@@ -2976,7 +2892,7 @@ class customdocument {
                             // Save certificate PDF.
                             if (!$this->issue_file_exists($issuedcert)) {
                                 // To force file creation.
-                                $issuedcert->haschange = true;
+                                $issuedcert->haschage = true;
                                 $this->get_issue_file($issuedcert);
                             }
                         }
@@ -2990,27 +2906,27 @@ class customdocument {
         }
         echo $OUTPUT->footer();
 
-    }
 
-        
-    /**
-     * Util function to loggin
-     *
-     * @param string $action Log action
-     */
-    private function add_to_log($action) {
-        if ($action) {
-            $event = \mod_customdocument\event\course_module_viewed::create(
-                array(
-                    'objectid' => $this->get_course_module()->instance,
-                    'context' => $this->get_context(),
-                    'other' => array('certificatecode' => $this->get_issue()->code)));
-                    $event->add_record_snapshot('course', $this->get_course());
-        }
-                
-        if (!empty($event)) {
-            $event->trigger();
-        }
-    }
-                
+
+}
+
+/**
+* Util function to loggin
+*
+* @param string $action Log action
+*/
+private function add_to_log($action) {
+if ($action) {
+$event = \mod_customdocument\event\course_module_viewed::create(
+array(
+'objectid' => $this->get_course_module()->instance,
+'context' => $this->get_context(),
+'other' => array('certificatecode' => $this->get_issue()->code)));
+$event->add_record_snapshot('course', $this->get_course());
+}
+
+if (!empty($event)) {
+$event->trigger();
+}
+}
 }

@@ -76,7 +76,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('customdocument/perpage', get_string('defaultperpage', 'customdocument'),
             get_string('defaultperpage_help', 'customdocument'), 30, PARAM_INT));
 
-    if(array_search('moofactory_resetmod', get_list_of_plugins('local'))){
+    if(array_key_exists('moofactory_resetmod', \core_component::get_plugin_list('local'))){
         // Validity.
         $settings->add(new admin_setting_configtext('customdocument/validity', get_string('defaultvalidity', 'customdocument'),
                 get_string('validity_help', 'customdocument'), 36, PARAM_INT));

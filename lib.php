@@ -57,6 +57,10 @@ function customdocument_update_instance(stdclass $data) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/customdocument/locallib.php');
 
+    if (empty($data->resetall) ) {
+        $data->resetall = "0";
+    }
+
     $context = context_module::instance($data->coursemodule);
     $customdocument = new customdocument($context, null, null);
     $data->id = $data->instance;

@@ -20,6 +20,8 @@
  * @package    mod
  * @subpackage customdocument
  * @copyright  LMS FACTORY <contact@lmsfactory.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  */
 
 $string['modulename'] = 'Custom Document';
@@ -233,6 +235,7 @@ $string['modulecoursetitle'] = "Course settings";
 $string['coursenamedesc'] = "Full course name";
 $string['coursestartdatedesc'] = "Course start date (as defined in course settings)";
 $string['courseenddatedesc'] = "Course end date (as defined in course settings)";
+$string['courseversiondesc'] = "Course current version";
 
 //User profile fields
 $string['userprofilefield'] = "User Profile fields";
@@ -283,3 +286,18 @@ $string['certcodedesc'] = "Document unique code";
 $string['formatnotfound'] = "Warning: Plugin 'moofactory course format' is neccessary";
 $string['formatfound'] = "Plugin 'moofactory course format' is installed. You can fully use moofactory custom document. For more information, visit our site: <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a>";
 $string['formatwarning'] = "Warning : To use the {USERMOOFACTORYTIME} merge field you need to install the 'Moofactory course format' plugin. More information about this plugin: <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a>";
+
+// Validity.
+$string['validity'] = 'Period of validity of the document, in months.';
+$string['validity_help'] = 'Duration the document is valid.';
+$string['defaultvalidity'] = 'Default period of validity of the document, in months.';
+$string['renewalperiod'] = 'Document renewal time, in weeks.';
+$string['renewalperiod_help'] = 'Period during which the user can renew his document. The start date is calculated according to the validity period. From this date, the user will again have to lift any restrictions for obtaining a new document.';
+$string['defaultrenewalperiod'] = 'Default document renewal time, in weeks.';
+$string['resetall'] = 'Reset all course activities.';
+$string['resetall_help'] = 'If checked, all course activities will be reset from the start date of the renewal period (completion and grade). Otherwise, only activities subject to restrictions for obtaining a new document will be.';
+$string['expired'] = ' <span class="expired">(expired)</span>';
+$string['expiredtxt'] = ' (expired)';
+
+$string['version_category'] = 'Version';
+$string['courseversion'] = 'Course current version';

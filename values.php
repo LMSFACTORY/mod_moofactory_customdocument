@@ -52,9 +52,7 @@ echo $OUTPUT->header();
                 <!-- Début de Champs de cours -->
                 <tr>
                     <td>{{COURSENAME}}</td>
-                    <td>
-                        <?php echo get_string('coursenamedesc', 'customdocument') ;?>
-                    </td>
+                    <td><?php echo get_string('coursenamedesc', 'customdocument') ;?></td>
                 </tr>
                 <tr>
                     <td>{{COURSESTARTDATE}}</td>
@@ -63,6 +61,10 @@ echo $OUTPUT->header();
                 <tr>
                     <td>{{COURSEENDDATE}}</td>
                     <td><?php echo get_string('courseenddatedesc', 'customdocument') ;?></td>
+                </tr>
+                <tr>
+                    <td>{{COURSEVERSION}}</td>
+                    <td><?php echo get_string('courseversiondesc', 'customdocument') ;?></td>
                 </tr>
                 <!-- Fin de Champs de cours -->
 

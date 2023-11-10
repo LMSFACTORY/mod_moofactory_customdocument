@@ -42,7 +42,10 @@
                 <FIELD NAME="secondpagetext" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="secondpagey" NEXT="secondpagetextformat"/>
                 <FIELD NAME="secondpagetextformat" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="secondpagetext" NEXT="secondimage"/>
                 <FIELD NAME="secondimage" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="secondpagetextformat" NEXT="timestartdatefmt"/>
-                <FIELD NAME="timestartdatefmt" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="secondpagetextformat" />
+                <FIELD NAME="timestartdatefmt" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="secondimage" NEXT="validity"/>
+                <FIELD NAME="validity" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="36" SEQUENCE="false" PREVIOUS="timestartdatefmt" NEXT="renewalperiod"/>
+                <FIELD NAME="renewalperiod" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="12" SEQUENCE="false" PREVIOUS="validity" NEXT="resetall"/>
+                <FIELD NAME="resetall" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="renewalperiod"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -58,10 +61,12 @@
                 <FIELD NAME="certificatename" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid" NEXT="code"/>
                 <FIELD NAME="code" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false" PREVIOUS="certificatename" NEXT="timecreated"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="code" NEXT="timedeleted"/>
-                <FIELD NAME="timedeleted" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timecreated" NEXT="haschange"/>
-                <FIELD NAME="haschange" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timedeleted" NEXT="pathnamehash"/>
+                <FIELD NAME="timedeleted" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timecreated" NEXT="timedisabled"/>
+                <FIELD NAME="timedisabled" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timedeleted" NEXT="haschange"/>
+                <FIELD NAME="haschange" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timedisabled" NEXT="pathnamehash"/>
                 <FIELD NAME="pathnamehash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" PREVIOUS="haschange" NEXT="coursename"/>
-                <FIELD NAME="coursename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" DEFAULT="--" PREVIOUS="pathnamehash" />
+                <FIELD NAME="coursename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" DEFAULT="--" PREVIOUS="pathnamehash" NEXT="courseversion"/>
+                <FIELD NAME="courseversion" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" PREVIOUS="coursename"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />

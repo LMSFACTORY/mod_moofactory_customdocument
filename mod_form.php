@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-if (!defined('MOODLE_INTERNAL')) {
+/**
+ *
+ * @package    mod
+ * @subpackage customdocument
+ * @copyright  Carlos Alexandre S. da Fonseca <carlos.alexandre@outlook.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
 }
 
@@ -75,7 +83,7 @@ class mod_customdocument_mod_form extends moodleform_mod {
         $url = new moodle_url('/mod/customdocument/values.php');
 
         $msg = get_string('infochamps', 'customdocument', $url->out());
-        $msg .= ' ' .$OUTPUT->help_icon('customhelp_help', 'customdocument');
+        // $msg .= ' ' .$OUTPUT->help_icon('infochamps', 'customdocument');
         $mform->addElement('static', 'content', '', $msg);
 
         $mform->addRule('certificatetext', get_string('error'), 'required', null, 'client');
@@ -108,6 +116,29 @@ class mod_customdocument_mod_form extends moodleform_mod {
         $mform->setDefault('certificatetexty', get_config('customdocument', 'certificatetexty'));
         $mform->setAdvanced('certificatetexty');
         $mform->addHelpButton('certificatetexty', 'textposition', 'customdocument');
+
+        if(array_key_exists('moofactory_resetmod', \core_component::get_plugin_list('local'))){
+            // Certificate period of validity.
+            $mform->addElement('text', 'validity', get_string('validity', 'customdocument'), array('size' => '5'));
+            $mform->setType('validity', PARAM_INT);
+            $mform->setDefault('validity', get_config('customdocument', 'validity'));
+            $mform->setAdvanced('validity');
+            $mform->addHelpButton('validity', 'validity', 'customdocument');
+            
+            // Certificate renewal period.
+            $mform->addElement('text', 'renewalperiod', get_string('renewalperiod', 'customdocument'), array('size' => '5'));
+            $mform->setType('renewalperiod', PARAM_INT);
+            $mform->setDefault('renewalperiod', get_config('customdocument', 'renewalperiod'));
+            $mform->setAdvanced('renewalperiod');
+            $mform->addHelpButton('renewalperiod', 'renewalperiod', 'customdocument');
+
+            // Reset all modules.
+            $mform->addElement('checkbox', 'resetall', get_string('resetall', 'customdocument'));
+            $mform->setDefault('resetall', get_config('customdocument', 'resetall'));
+            $mform->setAdvanced('resetall');
+            $mform->addHelpButton('resetall', 'resetall', 'customdocument');
+        }
+
 
         // Second page.
         $mform->addElement('header', 'secondpageoptions', get_string('secondpageoptions', 'customdocument'));

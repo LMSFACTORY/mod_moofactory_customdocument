@@ -182,3 +182,4 @@ $("table th").css({
   cursor: "pointer",
   fontWeight: "600",
 });
+

@@ -85,6 +85,7 @@ function send_certificate_file(stdClass $issuedcert) {
     //     // will send the certificate without watermark.
     //     send_stored_file($file, 0, 0, true);
     // } else {
+    //     // If no login or it's not certificate owner and don't have manage privileges
     //     // it will put a 'copy' watermark and send the file.
     //     $wmfile = put_watermark($file);
     //     send_temp_file($wmfile, $file->get_filename());

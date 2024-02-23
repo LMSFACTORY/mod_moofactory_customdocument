@@ -177,12 +177,27 @@ class customdocument {
 
         $result = $DB->update_record('customdocument', $update);
 
-        // No update if current course version is higher than issue courseversion.
+        // No update if current course version is higher than issue courseversion (deprecated).
+        /******************************************* */
+        // Never update exept if the user is manager.
+        /******************************************* */
         $courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
         $issuedcerts = $DB->get_records('customdocument_issues', array('certificateid' => $this->get_instance()->id,));
+
         foreach ($issuedcerts as $issuedcert) {
+            $ismanager = has_capability('mod/customdocument:manage', $this->context, $issuedcert->userid);
             if(empty($issuedcert->courseversion) || $courseversion <= $issuedcert->courseversion || $issuedcert->courseversion == "--"){
-                $haschange = 1;
+                // $haschange = 1;
+
+                // Never update modification.
+                if($ismanager){
+                    $haschange = 1;
+                }
+                else{
+                    $haschange = 0;
+                }
+                // End never update modification.
+
             }
             else{
                 $haschange = 0;
@@ -608,6 +623,12 @@ class customdocument {
 
         // The cache issue is from this user ?
         $created = false;
+
+        // echo("<br><br><br>issuedcert<pre>");
+        // var_dump($DB->get_record('customdocument_issues',
+        // array('userid' => $userid, 'certificateid' => $this->get_instance()->id, 'timedeleted' => null)));
+        // echo("</pre>");
+
         if (!empty($this->issuecert) && $this->issuecert->userid == $userid) {
             if (empty($this->issuecert->haschange)) {
                 // ...haschange is marked, if no return from cache.
@@ -666,22 +687,22 @@ class customdocument {
             // var_dump($isstudent);
             // echo("</pre>");
             // die;
-
+            
             // if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
-            if (has_capability('mod/customdocument:manage', $this->context, $userid) && !$isstudent) {
-                $issuedcert->id = 0;
-            } else {
-                $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
-
-                // Email to the teachers and anyone else.
-                if (!empty($this->get_instance()->emailteachers)) {
-                    $this->send_alert_email_teachers($issuedcert);
+                if (has_capability('mod/customdocument:manage', $this->context, $userid) && !$isstudent) {
+                    $issuedcert->id = 0;
+                } else {
+                    $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
+                    
+                    // Email to the teachers and anyone else.
+                    if (!empty($this->get_instance()->emailteachers)) {
+                        $this->send_alert_email_teachers($issuedcert);
+                    }
+                    
+                    if (!empty($this->get_instance()->emailothers)) {
+                        $this->send_alert_email_others($issuedcert);
+                    }
                 }
-
-                if (!empty($this->get_instance()->emailothers)) {
-                    $this->send_alert_email_others($issuedcert);
-                }
-            }
         }
 
         // If cache or db issued certificate is maked as haschange, must update.
@@ -1014,7 +1035,6 @@ class customdocument {
                 }// If it fails, oh well, too bad.
             }
         }
-        // echo(header("Location: {$url}"));
     }
     /**
      * Send Alerts email of received certificates
@@ -1065,7 +1085,7 @@ class customdocument {
      */
     protected function create_pdf_object() {
 
-        // Default orientation is Landescape.
+        // Default orientation is Landscape.
         $orientation = 'L';
 
         if ($this->get_instance()->height > $this->get_instance()->width) {
@@ -1086,7 +1106,6 @@ class customdocument {
         $pdf->SetAutoPageBreak(false, 0);
         $pdf->setFontSubsetting(true);
         $pdf->SetMargins(0, 0, 0, true);
-
 
         return $pdf;
     }
@@ -1726,6 +1745,7 @@ class customdocument {
             return $course_completion_date;
         }
     }
+
     /**
      * Get the user inscription end time
      * which will take in the userid as a parameter and do the query to the database
@@ -1776,9 +1796,10 @@ class customdocument {
             return $timeend;
         }
     }
+
     /**
      * Get the moofactory time
-     * which includes timespent ,intelliboard , and log time
+     * which includes timespent, intelliboard and log time
      * for each type there is only one function but admin can defined which time to use in the
      * course setting
      */
@@ -2536,26 +2557,39 @@ class customdocument {
             $users = array_slice($users, intval($page * $perpage), $perpage);
 
             foreach ($users as $user) {
-                $usercert = $this->get_issue($user, false);
-                $usercert->id = $user->ciid;
-                $usercert->userid = $user->id;
-                $usercert->code = $user->code;
+                // $usercert = $this->get_issue($user, false);
+                $usercert = new stdClass();
                 $usercert->timecreated = $user->timecreated;
-                $usercert->haschange = $user->haschange;
+                $usercert->timedisabled = $user->timedisabled;
                 $usercert->pathnamehash = $user->pathnamehash;
-                $name = $OUTPUT->user_picture($user) . $user->firstname;
-                $lastname = $user->lastname;
-                $chkbox = html_writer::checkbox('selectedissues[]', $user->ciid, false);
-                if($user->timedisabled){
-                    $date = '<span class="hidden">' . date("Y-m-d H:i:s", $usercert->timecreated) . '</span>' . userdate($usercert->timecreated) . get_string('expired', 'customdocument') . customdocument_print_issue_certificate_file($usercert);
-                    $table->rowclasses[] = "disabled";
+                $usercert->code = $user->code;
+                
+                if(!empty($usercert)){
+                    // $usercert->id = $user->ciid;
+                    // $usercert->userid = $user->id;
+                    // $usercert->code = $user->code;
+                    // $usercert->timecreated = $user->timecreated;
+                    // $usercert->timedisabled = $user->timedisabled;
+                    // $usercert->haschange = $user->haschange;
+                    // $usercert->pathnamehash = $user->pathnamehash;
+
+                    $name = $OUTPUT->user_picture($user) . $user->firstname;
+                    $lastname = $user->lastname;
+                    $chkbox = html_writer::checkbox('selectedissues[]', $user->ciid, false);
+                    if($user->timedisabled){
+                        $date = '<span class="hidden">' . date("Y-m-d H:i:s", $usercert->timecreated) . '</span>' . userdate($usercert->timecreated) . get_string('expired', 'customdocument') . customdocument_print_issue_certificate_file($usercert);
+                        $table->rowclasses[] = "disabled";
+                        $grade = "";
+                    }
+                    else{
+                        $date =  '<span class="hidden">' . date("Y-m-d H:i:s", $usercert->timecreated) . '</span>' . userdate($usercert->timecreated) . customdocument_print_issue_certificate_file($usercert);  
+                        $table->rowclasses[] = "";
+                        $grade = $this->get_grade($user->id);
+                    }
+                    $code = $user->code;
+                    $table->data[] = array($chkbox, $name, $lastname ,$date, $grade, $code);
+
                 }
-                else{
-                    $date =  '<span class="hidden">' . date("Y-m-d H:i:s", $usercert->timecreated) . '</span>' . userdate($usercert->timecreated) . customdocument_print_issue_certificate_file($usercert);  
-                    $table->rowclasses[] = "";
-                }
-                $code = $user->code;
-                $table->data[] = array($chkbox, $name, $lastname ,$date, $this->get_grade($user->id), $code);
             }
 
             // Create table to store buttons.

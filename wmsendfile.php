@@ -74,22 +74,23 @@ function send_certificate_file(stdClass $issuedcert) {
         $file = $fs->get_file_by_hash($issuedcert->pathnamehash);
     }
 
-    $canmanage = false;
-    $cm = get_coursemodule_from_instance('customdocument', $issuedcert->certificateid);
-    if ($cm) {
-        $canmanage = has_capability('mod/customdocument:manage', context_course::instance($cm->course));
-    }
+    // $canmanage = false;
+    // $cm = get_coursemodule_from_instance('customdocument', $issuedcert->certificateid);
+    // if ($cm) {
+    //     $canmanage = has_capability('mod/customdocument:manage', context_course::instance($cm->course));
+    // }
 
-    if ($canmanage || (!empty($USER) && $USER->id == $issuedcert->userid)) {
-        // If logged in it's owner of this certificate, or has can manage the course
-        // will send the certificate without watermark.
-        send_stored_file($file, 0, 0, true);
-    } else {
-        // If no login or it's not certificate owner and don't have manage privileges
-        // it will put a 'copy' watermark and send the file.
-        $wmfile = put_watermark($file);
-        send_temp_file($wmfile, $file->get_filename());
-    }
+    // if ($canmanage || (!empty($USER) && $USER->id == $issuedcert->userid)) {
+    //     // If logged in it's owner of this certificate, or has can manage the course
+    //     // will send the certificate without watermark.
+    //     send_stored_file($file, 0, 0, true);
+    // } else {
+    //     // it will put a 'copy' watermark and send the file.
+    //     $wmfile = put_watermark($file);
+    //     send_temp_file($wmfile, $file->get_filename());
+    // }
+
+    send_stored_file($file, 0, 0, true);
 }
 
 /**

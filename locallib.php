@@ -22,6 +22,11 @@
  * @copyright Carlos Alexandre Fonseca <carlos.alexandre@outlook.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+/**
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -958,6 +963,7 @@ class customdocument {
         if (!empty($this->get_instance()->emailteachers) && $teachers) {
             $emailteachers = array();
             foreach ($teachers as $teacher) {
+                // ici
                 $emailteachers[] = $teacher->user->email;
             }
             $this->send_alert_emails_to_all($emailteachers, $issuedcert);
@@ -1282,7 +1288,16 @@ class customdocument {
 
             // Prepare file record object.
             $context = $this->get_context();
-            $filename = str_replace(' ', '_', clean_filename($issuecert->certificatename . ' ' . $issuecert->id . '.pdf'));
+
+            $coureseshortname = str_replace(' ', '_', substr($this->get_course()->shortname, 0, 20));
+            $certname = str_replace(' ', '_', substr($DB->get_field('customdocument', 'name', ['id'=>$issuecert->certificateid]), 0, 20));
+            
+            $user = get_complete_user_data('id', $issuecert->userid);
+            $userfirstname = str_replace(' ', '_', substr($user->firstname, 0, 10));
+            $userlastname = str_replace(' ', '_', substr($user->lastname, 0, 10));
+
+            $filename = $coureseshortname.'-'.$certname.'-'.$userfirstname.'_'.$userlastname.'-'.$issuecert->id.'.pdf';
+            // $filename = str_replace(' ', '_', clean_filename($issuecert->certificatename . ' ' . $issuecert->id . '.pdf'));
             $fileinfo = array('contextid' => $context->id,
                     'component' => self::CERTIFICATE_COMPONENT_NAME,
                     'filearea' => self::CERTIFICATE_ISSUES_FILE_AREA,
@@ -1328,7 +1343,6 @@ class customdocument {
             $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
             $isstudent = !empty($students[$issuecert->userid]);
             $ismanager = has_capability('mod/customdocument:manage', $this->context, $issuecert->userid);
-
             // Verify if user is a manager, if not, update issuedcert.
             if ((!$ismanager || ($ismanager && $isstudent)) && !$DB->update_record('customdocument_issues', $issuecert)) {
                 print_error('cannotupdatemod', 'error', null, 'customdocument_issues');
@@ -2465,7 +2479,12 @@ class customdocument {
 
         // Now exclude all the certmanagers.
         foreach ($issedusers as $id => $user) {
-            if (!empty($certmanagers[$user->id])) { // Exclude certmanagers.
+            $coursectx = $this->get_course_context();
+            $studentroles = array_keys(get_archetype_roles('student'));
+            $students = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+            $isstudent = !empty($students[$user->id]);
+
+            if (!empty($certmanagers[$user->id]) && !$isstudent) { // Exclude certmanagers except if they are student.
                 unset ($issedusers[$id]);
             }
         }

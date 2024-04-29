@@ -22,6 +22,11 @@
  * @copyright Carlos Fonseca <carlos.alexandre@outlook.com>, Mark Nelson <mark@moodle.com.au>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+/**
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/grade/lib.php');
@@ -224,6 +229,8 @@ function customdocument_supports($feature) {
         case FEATURE_COMPLETION_HAS_RULES:
         case FEATURE_BACKUP_MOODLE2:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_CONTENT;
 
         default:
             return null;
@@ -528,32 +535,3 @@ function customdocument_print_issue_certificate_file(stdClass $issuecert) {
 
 }
 
-/**
- * This function receives a calendar event and returns the action associated with it, or null if there is none.
- *
- * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
- * is not displayed on the block.
- *
- * @param calendar_event $event
- * @param \core_calendar\action_factory $factory
- * @return \core_calendar\local\event\entities\action_interface|null
- */
-function mod_customdocument_core_calendar_provide_event_action(calendar_event $event,
-                                                            \core_calendar\action_factory $factory) {
-    $cm = get_fast_modinfo($event->courseid)->instances['customdocument'][$event->instance];
-
-    $completion = new \completion_info($cm->get_course());
-
-    $completiondata = $completion->get_data($cm, false);
-
-    if ($completiondata->completionstate != COMPLETION_INCOMPLETE) {
-        return null;
-    }
-
-    return $factory->create_instance(
-            get_string('view'),
-            new \moodle_url('/mod/customdocument/view.php', ['id' => $cm->id]),
-            1,
-            true
-    );
-}

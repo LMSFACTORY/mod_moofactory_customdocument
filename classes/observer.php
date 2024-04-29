@@ -19,8 +19,9 @@ namespace mod_customdocument;
 /**
  * Event observers
  *
- * @package   customdocument
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 

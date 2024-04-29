@@ -27,6 +27,11 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 - Carlos Alexandre S. da Fonseca
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
  */
+/**
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class certificate_verified extends \core\event\base  {
 
     protected function init() {

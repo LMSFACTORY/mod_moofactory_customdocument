@@ -17,11 +17,9 @@
 /**
  * Language strings for the customdocument module
  *
- * @package    mod
- * @subpackage customdocument
- * @copyright  LMS FACTORY <contact@lmsfactory.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['modulename'] = 'Custom Document';
@@ -84,11 +82,11 @@ $string['secondtextposition_help'] = 'The XY coordinates (in millimetres) of the
 
 //Merge fields references and formats
 $string['variablesoptions'] = 'Merge fields references and formats';
-$string['printdate'] = 'Date of activity completion for {ACTIVITYCOMPLETIONDATE} merge field';
-$string['printdate_help'] = 'Select an activity to substitute the {ACTIVITYCOMPLETIONDATE} merge field with the activity completion date';
+$string['printdate'] = 'Date of activity completion for {{ACTIVITYCOMPLETIONDATE}} merge field';
+$string['printdate_help'] = 'Select an activity to substitute the {{ACTIVITYCOMPLETIONDATE}] merge field with the activity completion date';
 
-$string['printgrade'] = 'Referenced grade for {GRADE} merge field';
-$string['printgrade_help'] = 'You can choose any available course grade items from the gradebook to print it : on the document in place of {GRADE} merge field, on the "Issued documents summary" and "Bulk operations" tab.';
+$string['printgrade'] = 'Referenced grade for {{GRADE}} tables and merge field';
+$string['printgrade_help'] = 'You can choose any available course grade items from the gradebook to print it : on the document in place of {{GRADE}} merge field, on the "Issued documents summary" and "Bulk operations" tab.';
 $string['gradefmt'] = 'Grade Format';
 $string['gradefmt_help'] = 'There are three available grade formats: as a percentage, as the point value of the grade and as a letter.';
 $string['gradeletter'] = 'Letter Grade';
@@ -125,6 +123,7 @@ $string['download'] = 'Force download';
 $string['emailcertificate'] = 'Send to student by email';
 $string['nodelivering'] = 'No delivering, user will receive this document using others ways';
 $string['emailoncompletion'] = 'Send to student email upon course completion';
+$string['emailonrestriction'] = 'Send to student email after lifting the access restriction';
 
 // Issue a document or test document
 $string['standardview'] = 'Issue a test document';
@@ -205,6 +204,7 @@ $string['eventcertificate_verified_description'] = 'The user with id {$a->userid
 $string['customdocument:addinstance'] = "Add Custom document Activity";
 $string['customdocument:manage'] = "Manage Custom document Activity";
 $string['customdocument:view'] = "View Custom document Activity";
+$string['customdocument:canreceivenotifications'] = "Receive notifications for teachers";
 
 // Erreurs
 $string['filenotfound'] = 'File not Found : {$a}';
@@ -301,3 +301,6 @@ $string['expiredtxt'] = ' (expired)';
 
 $string['version_category'] = 'Version';
 $string['courseversion'] = 'Course current version';
+
+// cron task
+$string['sendmailrestriction'] = 'Sending emails after restrictions are lifted';

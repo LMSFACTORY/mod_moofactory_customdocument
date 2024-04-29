@@ -21,6 +21,11 @@
  * @copyright  Carlos Alexandre S. da Fonseca <carlos.alexandre@outlook.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+/**
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
  if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
@@ -290,6 +295,7 @@ class mod_customdocument_mod_form extends moodleform_mod {
             2 => get_string('emailcertificate', 'customdocument'),
             3 => get_string('nodelivering','customdocument'),
             4 => get_string('emailoncompletion', 'customdocument'),
+            5 => get_string('emailonrestriction', 'customdocument'),
         );
         $mform->addElement('select', 'delivery', get_string('delivery', 'customdocument'), $deliveryoptions);
         $mform->setDefault('delivery', 0);

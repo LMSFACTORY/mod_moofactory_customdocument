@@ -19,24 +19,15 @@
  * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die;
-
-/**
- * Uninstall the plugin.
- *
- * @return boolean Always true (indicating success).
- */
-function xmldb_customdocument_uninstall() {
-    global $DB;
-
-    // Deletion of 'Version' category and related course custom fields.
-    $categoryid = $DB->get_field('customfield_category', 'id', array('name' =>get_string('version_category', 'customdocument')));
-    if ($categoryid){
-        $category = \core_customfield\category_controller::create($categoryid);
-        $handler = core_course\customfield\course_handler::create();
-        $handler->delete_category($category);
-    }
-
-    return true;
-}
+defined('MOODLE_INTERNAL') || die();
+$tasks = array(
+    array(
+        'classname' => '\mod_customdocument\task\send_mail_restriction',
+        'blocking' => 0,
+        'minute' => '*/2',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    )
+);

@@ -15,18 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Code fragment to define the version of the customdocument module
+ * Defines the version details.
  *
- * @package    mod
- * @subpackage customdocument
- * @author     Carlos Alexandre S. da Fonseca
- * @copyright  2013 - Carlos Alexandre S. da Fonseca
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 defined('MOODLE_INTERNAL') || die();
-$plugin->version  = 2024022300;  // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2024042700;  // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2019111800;  // Requires this Moodle version (moodle 3.8.x).
 $plugin->cron     = 4 * 3600;    // Period for cron to check this module (secs).
 $plugin->component = 'mod_customdocument';

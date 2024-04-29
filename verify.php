@@ -22,6 +22,11 @@
  * @copyright 2014 © Carlos Alexandre S. da Fonseca
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+/**
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('verify_form.php');

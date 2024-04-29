@@ -19,24 +19,26 @@
  * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_customdocument\task;
 
-defined('MOODLE_INTERNAL') || die;
+use mod_customdocument\customdocumentlib;
 
-/**
- * Uninstall the plugin.
- *
- * @return boolean Always true (indicating success).
- */
-function xmldb_customdocument_uninstall() {
-    global $DB;
+defined('MOODLE_INTERNAL') || die();
 
-    // Deletion of 'Version' category and related course custom fields.
-    $categoryid = $DB->get_field('customfield_category', 'id', array('name' =>get_string('version_category', 'customdocument')));
-    if ($categoryid){
-        $category = \core_customfield\category_controller::create($categoryid);
-        $handler = core_course\customfield\course_handler::create();
-        $handler->delete_category($category);
+class send_mail_restriction extends \core\task\scheduled_task {
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('sendmailrestriction', 'mod_customdocument');
     }
 
-    return true;
+    /**
+     * Run assignment cron.
+     */
+    public function execute() {
+        customdocumentlib::sendmailrestriction();
+    }
 }

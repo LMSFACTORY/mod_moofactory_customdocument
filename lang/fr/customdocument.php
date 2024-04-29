@@ -17,11 +17,9 @@
 /**
  * Language strings for the customdocument module
  *
- * @package    mod
- * @subpackage customdocument
- * @copyright  LMS FACTORY <contact@lmsfactory.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
@@ -83,11 +81,11 @@ $string['secondtextposition_help'] = 'Coordonnées XY (en millimètres) du conte
 
 //Références et formats des champs de fusion
 $string['variablesoptions'] = 'Références et format des champs de fusion';
-$string['printdate'] = 'Date d\'achèvement de l\'activité sélectionnée pour le champ de fusion {ACTIVITYCOMPLETIONDATE}';
-$string['printdate_help'] = 'Sélectionnez l\'activité dont la date d\'achèvement par l s\'affichera pour le champ de fusion {ACTIVITYCOMPLETIONDATE}';
+$string['printdate'] = 'Date d\'achèvement de l\'activité sélectionnée pour le champ de fusion {{ACTIVITYCOMPLETIONDATE}}';
+$string['printdate_help'] = 'Sélectionnez l\'activité dont la date d\'achèvement par l s\'affichera pour le champ de fusion {{ACTIVITYCOMPLETIONDATE}}';
 
-$string['printgrade'] = 'Note de référence pour le champ de fusion {GRADE}';
-$string['printgrade_help'] = 'Sélectionnez la note du cours ou celle d\'une activité présente dans le carnet de notes. Cet élément sera la référence pour afficher la note de l\'étudiant à la place du champ de fusion {GRADE} mais aussi celui qui s\'affichera dans les listes "Récapitulatif des documents délivrés" et "Action en lot".';
+$string['printgrade'] = 'Note de référence pour les tableaux et le champ de fusion {{GRADE}}';
+$string['printgrade_help'] = 'Sélectionnez la note du cours ou celle d\'une activité présente dans le carnet de notes. Cet élément sera la référence pour afficher la note de l\'étudiant à la place du champ de fusion {{GRADE}} mais aussi celui qui s\'affichera dans les listes "Récapitulatif des documents délivrés" et "Action en lot".';
 $string['gradefmt'] = 'Format de la note de l\'apprenant';
 $string['gradefmt_help'] = 'Il existe trois formats de notes disponibles : en pourcentage, en point (dépend du paramétrage des différentes activités) ou en lettre (dépend du paramétrage du carnet de note).';
 $string['gradeletter'] = 'Note par lettres';
@@ -125,6 +123,7 @@ $string['download'] = 'Forcer le téléchargement';
 $string['emailcertificate'] = 'Envoi par courriel';
 $string['nodelivering'] = 'Pas d\'émission du document, l\'utilisateur le recevra autrement';
 $string['emailoncompletion'] = 'Envoi automatique par courriel après achevement du cours';
+$string['emailonrestriction'] = 'Envoi automatique par courriel après levée de la restriction d\'accès';
 
 // Générer un document ou un document de test
 $string['standardview'] = 'Générer un document de test';
@@ -198,6 +197,7 @@ $string['eventcertificate_verified_description'] = 'The user with id {$a->userid
 $string['customdocument:addinstance'] = "Ajouter une activité Document personnalisé";
 $string['customdocument:manage'] = "Gérer l'activité Document personnalisé";
 $string['customdocument:view'] = "Voir l'activité Document personnalisé";
+$string['customdocument:canreceivenotifications'] = "Recevoir les notifications destinées aux enseignants";
 
 // Erreurs
 $string['filenotfound'] = 'Fichier non trouvé : {$a}';
@@ -293,4 +293,5 @@ $string['expiredtxt'] = ' (périmé)';
 $string['version_category'] = 'Version';
 $string['courseversion'] = 'Version courante du cours';
 
-    
+// cron task
+$string['sendmailrestriction'] = 'Envoi de couriels après levée des restrictions';

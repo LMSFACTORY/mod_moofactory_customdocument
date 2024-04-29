@@ -45,6 +45,11 @@
 //
 // For the core capabilities, the variable is $moodle_capabilities.
 
+/**
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
 
@@ -71,7 +76,7 @@ $capabilities = array(
         )
     ),
 
-     'mod/customdocument:manage' => array(
+    'mod/customdocument:manage' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -79,6 +84,16 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
+        )
+     ),
+
+     'mod/customdocument:canreceivenotifications' => array(
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW
         )
      ),
 );

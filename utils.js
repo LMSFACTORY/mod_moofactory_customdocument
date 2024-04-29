@@ -119,7 +119,6 @@ if (selectAllCheckbox) {
 
 if (selectAllCheckboxBulk) {
   selectAllCheckboxBulk.addEventListener("click", () => {
-    alert("test");
     checkAll(selectAllCheckboxBulk, allCheckboxesBulk);
   });
 }

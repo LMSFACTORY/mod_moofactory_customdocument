@@ -32,15 +32,11 @@
 // using the functions defined in lib/ddllib.php.
 
 /**
- *
- * @package    mod
- * @subpackage customdocument
- * @copyright  LMS FACTORY <contact@lmsfactory.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
+ * @package     mod_customdocument
+ * @copyright   2024 Patrick ROCHET <patrick.r@lmsfactory.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
- defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
 
 function xmldb_customdocument_upgrade($oldversion = 0) {
@@ -524,5 +520,38 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         // Customdocument savepoint reached.
         upgrade_mod_savepoint(true, 2023032202, 'customdocument');
     }
+
+    if ($oldversion < 2024042600) {
+        $issues = $DB->get_records('customdocument_issues');
+        foreach ($issues as $issue) {
+            $customdocument = $DB->get_record('customdocument', ['id'=>$issue->certificateid]);
+            $course = get_course($customdocument->course);
+        
+            $coureseshortname = str_replace(' ', '_', substr($course->shortname, 0, 20));
+            $certname = str_replace(' ', '_', substr($customdocument->name, 0, 20));
+        
+            $user = get_complete_user_data('id', $issue->userid);
+            $userfirstname = str_replace(' ', '_', substr($user->firstname, 0, 10));
+            $userlastname = str_replace(' ', '_', substr($user->lastname, 0, 10));
+        
+            $filename = $coureseshortname.'-'.$certname.'-'.$userfirstname.'_'.$userlastname.'-'.$issue->id.'.pdf';
+        
+            $fs = get_file_storage();
+            if(!empty($issue->pathnamehash)){
+                $file = $fs->get_file_by_hash($issue->pathnamehash);
+                $currentfilename = $file->get_filename();
+        
+                if($filename != $currentfilename){
+                    $file->rename($file->get_filepath(), $filename);
+    
+                    $data = new stdClass();
+                    $data->id = $issue->id;
+                    $data->pathnamehash = $file->get_pathnamehash();
+                    $DB->update_record('customdocument_issues', $data);
+                }
+            }
+        }
+    }
+
     return true;
 }

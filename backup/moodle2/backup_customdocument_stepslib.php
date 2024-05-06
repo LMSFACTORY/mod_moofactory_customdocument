@@ -73,8 +73,9 @@ class backup_customdocument_activity_structure_step extends backup_activity_stru
         $issue->annotate_ids('user', 'userid');
 
         // Define file annotations.
+        $certificate->annotate_files(customdocument::CERTIFICATE_COMPONENT_NAME, 'intro', null); // This file area hasn't itemid
         $certificate->annotate_files(customdocument::CERTIFICATE_COMPONENT_NAME,
-                        customdocument::CERTIFICATE_IMAGE_FILE_AREA, null);
+                        customdocument::CERTIFICATE_IMAGE_FILE_AREA, null); // This file area hasn't itemid
         $issue->annotate_files(customdocument::CERTIFICATE_COMPONENT_NAME,
                         customdocument::CERTIFICATE_ISSUES_FILE_AREA, 'id');
 

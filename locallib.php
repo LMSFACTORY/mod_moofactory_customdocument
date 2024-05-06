@@ -898,6 +898,8 @@ class customdocument {
             $modinfo->percentage = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals = 2);
             $modinfo->letter = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_LETTER, $decimals = 0);
 
+            $modinfo->hidden = $item->grades[$userid]->hidden;
+
             if ($grade) {
                 $modinfo->dategraded = $item->grades[$userid]->dategraded;
             } else {
@@ -963,8 +965,10 @@ class customdocument {
         if (!empty($this->get_instance()->emailteachers) && $teachers) {
             $emailteachers = array();
             foreach ($teachers as $teacher) {
-                // ici
-                $emailteachers[] = $teacher->user->email;
+                $userid = $teacher->user->id;
+                if (has_capability('mod/customdocument:canreceivenotifications', $this->context, $userid)){
+                    $emailteachers[] = $teacher->user->email;
+                }
             }
             $this->send_alert_emails_to_all($emailteachers, $issuedcert);
         }
@@ -2200,8 +2204,11 @@ class customdocument {
                 continue;
             }
             $cm = get_coursemodule_from_instance($item->itemmodule, $item->iteminstance);
-            $usergrade = $this->get_formated_grade($this->get_mod_grade($cm->id, $userid));
-            $retval = $item->itemname . ": $usergrade<br>" . $retval;
+            $modinfo = $this->get_mod_grade($cm->id, $userid);
+            if(!$modinfo->hidden){
+                $usergrade = $this->get_formated_grade($this->get_mod_grade($cm->id, $userid));
+                $retval = $item->itemname . ": $usergrade<br>" . $retval;
+            }
         }
         return $retval;
     }

@@ -56,6 +56,8 @@ class restore_customdocument_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
         $contents[] = new restore_decode_content('customdocument', array('intro'), 'customdocument');
+        $contents[] = new restore_decode_content('customdocument', array('certificatetext'), 'customdocument');
+        $contents[] = new restore_decode_content('customdocument', array('secondpagetext'), 'customdocument');
         return $contents;
     }
 
@@ -67,6 +69,7 @@ class restore_customdocument_activity_task extends restore_activity_task {
         $rules = array();
         $rules[] = new restore_decode_rule('CUSTOMDOCUMENTVIEWBYID', '/mod/customdocument/view.php?id=$1', 'course_module');
         $rules[] = new restore_decode_rule('CUSTOMDOCUMENTINDEX', '/mod/customdocument/index.php?id=$1', 'course');
+        
         return $rules;
     }
 

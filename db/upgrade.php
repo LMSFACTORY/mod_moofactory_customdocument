@@ -540,15 +540,17 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
                 $fs = get_file_storage();
                 if(!empty($issue->pathnamehash)){
                     $file = $fs->get_file_by_hash($issue->pathnamehash);
-                    $currentfilename = $file->get_filename();
+                    if(!empty($file)){
+                        $currentfilename = $file->get_filename();
+                
+                        if($filename != $currentfilename){
+                            $file->rename($file->get_filepath(), $filename);
             
-                    if($filename != $currentfilename){
-                        $file->rename($file->get_filepath(), $filename);
-        
-                        $data = new stdClass();
-                        $data->id = $issue->id;
-                        $data->pathnamehash = $file->get_pathnamehash();
-                        $DB->update_record('customdocument_issues', $data);
+                            $data = new stdClass();
+                            $data->id = $issue->id;
+                            $data->pathnamehash = $file->get_pathnamehash();
+                            $DB->update_record('customdocument_issues', $data);
+                        }
                     }
                 }
             }

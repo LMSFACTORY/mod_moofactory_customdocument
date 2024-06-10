@@ -39,7 +39,8 @@ $string['keywords'] = 'document, certificate, course, pdf, moodle';
 $string['pluginadministration'] = 'Document administration';
 $string['deletissuedcertificates'] = 'Delete issued documents';
 $string['nocertificatesissued'] = 'There are no issued document';
-$string['awardedsubject'] = 'Awarded document notification: {$a->document} issued to {$a->student}';
+// $string['awardedsubject'] = 'Awarded document notification: {$a->document} issued to {$a->student}';
+$string['awardedsubject'] = '{$a->student} got a document from {$a->sitefullname}';
 $string['modulename_help'] = 'The custom document activity module enables the teacher to create a custom document that can be issued to participants who have completed the teacher’s specified requirements.';
 $string['certificatecopy'] = 'COPY';
 
@@ -111,9 +112,9 @@ $string['qrcodeposition_help'] = 'The XY coordinates (in millimeters) of the QR 
 
 //Issue Options
 $string['issueoptions'] = 'Issue Options';
-$string['emailteachers'] = 'Notify teachers by email';
+$string['emailteachers'] = 'Notify and email a copy to the learner\'s teachers and supervisors';
 $string['emailothers'] = 'Other e-mail addresses to notify';
-$string['emailteachers_help'] = 'If enabled, then teachers are alerted with an e-mail whenever a document is issued.';
+$string['emailteachers_help'] = 'If enabled, each time a document is generated, roles with the "mod/customdocument:canreceivenotifications" capability will receive an email with the document attached.';
 $string['emailothers_help'] = 'Enter the email addresses here, separated by a comma, for those who should be alerted with an email whenever a document is issued.';
 
 $string['delivery'] = 'Delivery behaviour when a student issues his own document';
@@ -156,30 +157,34 @@ $string['bulkbuttonlabel'] = 'Download or send selected documents';
 $string['bulkwarning'] = "If no selection, all the students from the list will have their document issued";
 
 // Emails text.
-$string['emailstudentsubject'] = 'Your document for {$a->course}';
+$string['emailstudentsubject'] = 'Your document is available on {$a->sitefullname}';
+
 $string['emailstudenttext'] = '
 Hello {$a->username},
 
-		Attached is your document for {$a->course}.
-
-
+Attached you will find your document "{$a->certificate}" concerning the course "{$a->course}".
+ 
 THIS IS AN AUTOMATED MESSAGE - PLEASE DO NOT REPLY';
 
 $string['emailteachermail'] = '
-{$a->student} has received the document: \'{$a->document}\'
-for {$a->course}.
+Hello{$a->username},
 
-You can review it here:
+{$a->student} obtained the document "{$a->document}" for the course "{$a->course}".
 
-    {$a->url}';
+Attached you will find the document.
+You can also consult it at: {$a->url}.
+
+THIS IS AN AUTOMATIC MESSAGE - PLEASE DO NOT REPLY';
 
 $string['emailteachermailhtml'] = '
-{$a->student} has received the document: \'<i>{$a->document}</i>\'
-for {$a->course}.
+Hello{$a->username},
 
-You can review it here:
+{$a->student} obtained the document "<i>{$a->document}</i>" for the course "{$a->course}".
 
-    <a href="{$a->url}">Document Report</a>.';
+Attached you will find the document.
+You can also consult it at: <a href="{$a->url}">Document Report</a>.
+
+THIS IS AN AUTOMATIC MESSAGE - PLEASE DO NOT REPLY';
 
 // Admin settings page
 $string['defaultwidth'] = 'Default Width';
@@ -228,6 +233,7 @@ $string['customhelp_help'] = "Contact the teacher if needed";
 $string['moduledoctitle'] = "Custom document merge fields";
 $string['thnom'] = "Name";
 $string['thdescription'] = "Description";
+$string['colon'] = ": ";
 
 //Course settings
 // $string['coursefield'] = "Course settings";
@@ -275,7 +281,7 @@ $string['usermoofactorytimedesc'] = "Time spent in hours and minutes according t
 
 // Strigns Course attribution
 $string['moduleattributiontitle'] = "In-course role and group";
-$string['teachersdesc'] = "Teacher list";
+$string['teachersdesc'] = "List of course contacts, as defined at the site administration level on the page /admin/settings.php?section=coursecontact";
 $string['userroledesc'] = "User role in course";
 $string['groupnamedesc'] = "User group list (display in line, separated by a comma)";
 

@@ -117,6 +117,7 @@ class restore_customdocument_activity_structure_step extends restore_activity_st
         // Add customdocument related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_customdocument', 'intro', null);
         $this->add_related_files('mod_customdocument', 'image', null);
+        $this->add_related_files('mod_customdocument', 'certimage', null);
         $this->add_related_files('mod_customdocument', 'issues', null);
     }
 

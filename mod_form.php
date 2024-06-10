@@ -342,7 +342,19 @@ class mod_customdocument_mod_form extends moodleform_mod {
             $data['certificateimage'] = $imagedraftitemid;
 
             // Prepare certificate text.
-            $data['certificatetext'] = array('text' => $data['certificatetext'], 'format' => FORMAT_HTML);
+            $text = $data['certificatetext'];
+            $draftid_editor = file_get_submitted_draft_itemid('certificatetext');
+            if (empty($text)) {
+                $currenttext = '';
+            } else {
+                $currenttext = $text;
+            }
+            $textfileinfo = customdocument::get_certificate_text_fileinfo($this->context);
+            $newtext = file_prepare_draft_area($draftid_editor, $textfileinfo['contextid'],
+            $textfileinfo['component'], $textfileinfo['filearea'],
+            $textfileinfo['itemid'], $this->get_filemanager_options_array(), $currenttext);
+
+            $data['certificatetext'] = array('text' => $newtext , 'itemid' => $draftid_editor, 'format' => FORMAT_HTML);
 
             // Second page.
             // Get Back image.
@@ -356,11 +368,27 @@ class mod_customdocument_mod_form extends moodleform_mod {
             $data['secondimage'] = $secondimagedraftitemid;
 
             // Get backpage text.
-            if (!empty($data['secondpagetext'])) {
-                $data['secondpagetext'] = array('text' => $data['secondpagetext'], 'format' => FORMAT_HTML);
+            // if (!empty($data['secondpagetext'])) {
+            //     $data['secondpagetext'] = array('text' => $data['secondpagetext'], 'format' => FORMAT_HTML);
+            // } else {
+            //     $data['secondpagetext'] = array('text' => '', 'format' => FORMAT_HTML);
+            // }
+
+
+            $text = $data['secondpagetext'];
+            $draftid_editor = file_get_submitted_draft_itemid('secondpagetext');
+            if (empty($text)) {
+                $currenttext = '';
             } else {
-                $data['secondpagetext'] = array('text' => '', 'format' => FORMAT_HTML);
+                $currenttext = $text;
             }
+            $textfileinfo = customdocument::get_certificate_secondtext_fileinfo($this->context);
+            $newtext = file_prepare_draft_area($draftid_editor, $textfileinfo['contextid'],
+            $textfileinfo['component'], $textfileinfo['filearea'],
+            $textfileinfo['itemid'], $this->get_filemanager_options_array(), $currenttext);
+
+            $data['secondpagetext'] = array('text' => $newtext , 'itemid' => $draftid_editor, 'format' => FORMAT_HTML);
+
         } else { // Load default.
             $data['certificatetext'] = array('text' => '', 'format' => FORMAT_HTML);
             $data['secondpagetext'] = array('text' => '', 'format' => FORMAT_HTML);

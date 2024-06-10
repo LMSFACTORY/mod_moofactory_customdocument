@@ -40,7 +40,8 @@ $string['keywords'] = 'document, certificate, course, pdf, moodle';
 $string['pluginadministration'] = 'Administration du document';
 $string['deletissuedcertificates'] = 'Supprimer les documents délivrés';
 $string['nocertificatesissued'] = 'Il n\'y a aucun document délivré.';
-$string['awardedsubject'] = 'Notification de document émis : {$a->document} délivré à {$a->student}';
+// $string['awardedsubject'] = 'Notification de document émis : {$a->document} délivré à {$a->student}';
+$string['awardedsubject'] = '{$a->student} a obtenu un document sur {$a->sitefullname}';
 $string['modulename_help'] = 'Document personnalisé permet aux enseignants/formateurs de créer un document personnalisé (attestation...) pouvant être délivré aux participants ayant levé les restrictions d\'accès de l\'activité.';
 $string['certificatecopy'] = 'COPIER';
 
@@ -110,8 +111,8 @@ $string['qrcodeposition_help'] = 'Coordonnées XY (en millimètres) du QR Code s
 
 //Options de délivrance
 $string['issueoptions'] = 'Options de délivrance';
-$string['emailteachers'] = 'Notifier les enseignants par courriel';
-$string['emailteachers_help'] = 'Si "Oui", les enseignants seront alertés par courriel chaque fois qu\'un document sera généré.';
+$string['emailteachers'] = 'Notifier et envoyer une copie par courriel aux enseignants et superviseurs de l\'apprenant';
+$string['emailteachers_help'] = 'Si "Oui", chaque fois qu\'un document sera généré, les rôles ayant la capacité "mod/customdocument:canreceivenotifications" recevront un courriel avec le document en pièce jointe.';
 $string['emailothers'] = 'Autres adresses courriels à notifier';
 $string['emailothers_help'] = 'Entrez ici, séparées par une virgule, les adresses courriel qui doivent être alertées chaque fois qu\'un document sera généré.';
 
@@ -156,23 +157,33 @@ $string['bulkbuttonlabel'] = 'Télécharger ou envoyer les documents';
 $string['bulkwarning'] = "Si aucune sélection, tous les apprenants de la liste seront pris en compte";
 
 // Contenu des emails
-$string['emailstudentsubject'] = 'Votre document pour {$a->course}';
+$string['emailstudentsubject'] = 'Votre document est disponible sur {$a->sitefullname}';
 $string['emailstudenttext'] = '
 Bonjour {$a->username},
 
-		Ci-joint vous trouverez votre document concernant la formation "{$a->course}".
-
+Ci-joint vous trouverez votre document "{$a->certificate}" concernant la formation "{$a->course}".
+ 
 CECI EST UN MESSAGE AUTOMATIQUE - MERCI DE NE PAS REPONDRE';
 
 $string['emailteachermail'] = '
-{$a->student} a reçu son document : "{$a->document}" pour la formation "{$a->course}".
+Bonjour{$a->username},
 
-Vous pouvez le consulter à l\'adresse : {$a->url}';
+{$a->student} a obtenu le document "{$a->document}" pour la formation "{$a->course}".
+
+Ci-joint vous trouverez le document.
+Vous pouvez également le consulter à l\'adresse : {$a->url}.
+
+CECI EST UN MESSAGE AUTOMATIQUE - MERCI DE NE PAS REPONDRE';
 
 $string['emailteachermailhtml'] = '
-{$a->student} a reçu son document : "<i>{$a->document}</i>" pour la formation "{$a->course}".
+Bonjour{$a->username},
 
-Vous pouvez le consulter à l\'adresse : <a href="{$a->url}">Récapitulatif des documents délivrés</a>.';
+{$a->student} a obtenu le document "<i>{$a->document}</i>" pour la formation "{$a->course}".
+
+Ci-joint vous trouverez le document.
+Vous pouvez également le consulter à l\'adresse : <a href="{$a->url}">Récapitulatif des documents délivrés</a>.
+
+CECI EST UN MESSAGE AUTOMATIQUE - MERCI DE NE PAS REPONDRE';
 
 // Admin settings page
 $string['defaultwidth'] = 'Largeur par défaut';
@@ -220,6 +231,7 @@ $string['customhelp_help'] = "Contactez le formateur en cas de besoin";
 $string['moduledoctitle'] = "Champs de fusion de Document personalisé";
 $string['thnom'] = "Nom";
 $string['thdescription'] = "Description";
+$string['colon'] = " : ";
 
 //Paramètres du cours
 // $string['coursefield'] = "Paramètres du cours";
@@ -266,7 +278,7 @@ $string['usermoofactorytimedesc'] = "Temps passé en heures et en minutes sur le
 
 // Strigns Course attribution
 $string['moduleattributiontitle'] = "Attribution dans le cours";
-$string['teachersdesc'] = " Liste des enseignants du cours";
+$string['teachersdesc'] = "Liste des contacts du cours, comme défini au niveau de l'administration du site sur la page /admin/settings.php?section=coursecontact";
 $string['userroledesc'] = "Rôles de l'utilisateur dans le cours";
 $string['groupnamedesc'] = "Liste des groupes auxquels est inscrit l'apprenant (en ligne, séparés par une virgule)";
 

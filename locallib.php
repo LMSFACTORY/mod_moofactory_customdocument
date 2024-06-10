@@ -51,10 +51,12 @@ class customdocument {
     /**
      *  module constats using in file storage
      * @var CERTIFICATE_COMPONENT_NAME  base componete name
+     * @var CERTIFICATE_CERTIMAGE_FILE_AREA certificate image filearea
      * @var CERTIFICATE_IMAGE_FILE_AREA image filearea
      * @var CERTIFICATE_ISSUES_FILE_AREA issued certificates filearea
      */
     const CERTIFICATE_COMPONENT_NAME = 'mod_customdocument';
+    const CERTIFICATE_CERTIMAGE_FILE_AREA = 'certimage';
     const CERTIFICATE_IMAGE_FILE_AREA = 'image';
     const CERTIFICATE_ISSUES_FILE_AREA = 'issues';
 
@@ -471,15 +473,18 @@ class customdocument {
      * @return stdClass The customdocument instance object
      */
     private function populate_customdocument_instance(stdclass $formdata) {
-
-        // Clear image filearea.
+        // Clear image filearea and certificate image file area.
         $fs = get_file_storage();
         $fs->delete_area_files($this->get_context()->id, self::CERTIFICATE_COMPONENT_NAME, self::CERTIFICATE_IMAGE_FILE_AREA);
+        $fs->delete_area_files($this->get_context()->id, self::CERTIFICATE_COMPONENT_NAME, self::CERTIFICATE_CERTIMAGE_FILE_AREA);
         // Creating a customdocument instace object.
         $update = new stdClass();
 
         if (isset($formdata->certificatetext['text'])) {
-            $update->certificatetext = $formdata->certificatetext['text'];
+
+            $fileinfo = self::get_certificate_text_fileinfo($this->context->id);
+            $update->certificatetext = $this->save_upload_file($formdata->certificatetext['itemid'], $fileinfo, $formdata->certificatetext['text']);
+
             if (!isset($formdata->certificatetextformat)) {
                 $update->certificatetextformat = $formdata->certificatetext['format'];
             }
@@ -487,7 +492,10 @@ class customdocument {
         }
 
         if (isset($formdata->secondpagetext['text'])) {
-            $update->secondpagetext = $formdata->secondpagetext['text'];
+
+            $fileinfo = self::get_certificate_secondtext_fileinfo($this->context->id);
+            $update->secondpagetext = $this->save_upload_file($formdata->secondpagetext['itemid'], $fileinfo, $formdata->secondpagetext['text']);
+
             if (!isset($formdata->secondpagetextformat)) {
                 $update->secondpagetextformat = $formdata->secondpagetext['format'];
             }
@@ -531,7 +539,8 @@ class customdocument {
      * @param array $fileinfo The file info array, where to store uploaded file
      * @return string filename
      */
-    private function save_upload_file($formitemid, array $fileinfo) {
+    private function save_upload_file($formitemid, array $fileinfo, $text=null) {
+        global $USER;
         // Clear file area.
         if (empty($fileinfo['itemid'])) {
             $fileinfo['itemid'] = '';
@@ -539,13 +548,58 @@ class customdocument {
 
         $fs = get_file_storage();
         $fs->delete_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
-        file_save_draft_area_files($formitemid, $fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
-                                $fileinfo['itemid']);
+        $certtext = file_save_draft_area_files($formitemid, $fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                                $fileinfo['itemid'], null, $text);
+
+        // Delete current draft
+        $usercontext = context_user::instance($USER->id);
+        $fs->delete_area_files_select($usercontext->id, 'user', 'draft', "=$formitemid");
+
+
         // Get only files, not directories.
         $files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], '',
                                     false);
         $file = array_shift($files);
-        return $file->get_filename();
+        if(!empty($text)){
+            return $certtext;
+        }
+        else{
+            if(!empty($file)){
+                return $file->get_filename();
+            }
+        }
+    }
+
+    /**
+     * Get the first page text fileinfo
+     *
+     * @param mixed $context The module context object or id
+     * @return the first page background image fileinfo
+     */
+    public static function get_certificate_text_fileinfo($context) {
+        if (is_object($context)) {
+            $contextid = $context->id;
+        } else {
+            $contextid = $context;
+        }
+
+        return array('contextid' => $contextid, // ID of context
+                    'component' => self::CERTIFICATE_COMPONENT_NAME, // Usually = table name.
+                    'filearea' => self::CERTIFICATE_CERTIMAGE_FILE_AREA, // Usually = table name.
+                    'itemid' => 1, // Usually = ID of row in table.
+                    'filepath' => '/'); // Any path beginning and ending in /.
+    }
+
+    /**
+     * Get the second page text fileinfo
+     *
+     * @param mixed $context The module context object or id
+     * @return the first page background image fileinfo
+     */
+    public static function get_certificate_secondtext_fileinfo($context) {
+        $fileinfo = self::get_certificate_text_fileinfo($context);
+        $fileinfo['itemid'] = 2;
+        return $fileinfo;
     }
 
     /**
@@ -562,10 +616,10 @@ class customdocument {
         }
 
         return array('contextid' => $contextid, // ID of context
-                          'component' => self::CERTIFICATE_COMPONENT_NAME, // Usually = table name.
-                          'filearea' => self::CERTIFICATE_IMAGE_FILE_AREA, // Usually = table name.
-                          'itemid' => 1, // Usually = ID of row in table.
-                          'filepath' => '/'); // Any path beginning and ending in /.
+                    'component' => self::CERTIFICATE_COMPONENT_NAME, // Usually = table name.
+                    'filearea' => self::CERTIFICATE_IMAGE_FILE_AREA, // Usually = table name.
+                    'itemid' => 1, // Usually = ID of row in table.
+                    'filepath' => '/'); // Any path beginning and ending in /.
     }
 
     /**
@@ -930,11 +984,12 @@ class customdocument {
      *
      * @return array the teacher array
      */
-    protected function get_teachers() {
+    protected function get_teachers($fusionfield=false) {
         global $CFG, $DB;
         $teachers = array();
 
-        if (!empty($CFG->coursecontact)) {
+    
+        if ($fusionfield && !empty($CFG->coursecontact)) {
             $coursecontactroles = explode(',', $CFG->coursecontact);
         } else {
             list($coursecontactroles, $trash) = get_roles_with_cap_in_context($this->get_context(), 'mod/customdocument:manage');
@@ -963,14 +1018,23 @@ class customdocument {
     protected function send_alert_email_teachers($issuedcert) {
         $teachers = $this->get_teachers();
         if (!empty($this->get_instance()->emailteachers) && $teachers) {
-            $emailteachers = array();
+            $teachersinfo = array();
             foreach ($teachers as $teacher) {
                 $userid = $teacher->user->id;
-                if (has_capability('mod/customdocument:canreceivenotifications', $this->context, $userid)){
-                    $emailteachers[] = $teacher->user->email;
+
+                $aag = has_capability('moodle/site:accessallgroups', $this->context, $userid);
+                $groupmode = $this->coursemodule->groupmode;
+                $teachergroups = explode(',', $this->getGroupData($userid, $this->course->id));
+                $usergroups = explode(',', $this->getGroupData($issuedcert->userid, $this->course->id));
+
+                if (($groupmode == VISIBLEGROUPS || $aag || !empty(array_intersect($teachergroups, $usergroups))) && has_capability('mod/customdocument:canreceivenotifications', $this->context, $userid)){
+                    $info = new stdClass;
+                    $info->email = $teacher->user->email;
+                    $info->username = ' '.format_string(fullname($teacher->user), true);
+                    $teachersinfo[] = $info;
                 }
             }
-            $this->send_alert_emails_to_all($emailteachers, $issuedcert);
+            $this->send_alert_emails_to_all($teachersinfo, $issuedcert);
         }
     }
 
@@ -980,10 +1044,16 @@ class customdocument {
      */
     protected function send_alert_email_others($issuedcert) {
         if (!empty($this->get_instance()->emailothers)) {
-
+            $othersinfo = array();
             $others = explode(',', $this->get_instance()->emailothers);
             if ($others) {
-                $this->send_alert_emails_to_all($others, $issuedcert);
+                foreach ($others as $other) {
+                    $info = new stdClass;
+                    $info->email = $other;
+                    $info->username = '';
+                    $othersinfo[] = $info;
+                }               
+                $this->send_alert_emails_to_all($othersinfo, $issuedcert);
             }
         }
     }
@@ -994,17 +1064,17 @@ class customdocument {
      * which had errors.
      * @param array $emails emails arrays
      */
-    protected function send_alert_emails_to_all($emails, $issuedcert) {
-        global $USER, $CFG, $DB;
+    protected function send_alert_emails_to_all($teachersinfo, $issuedcert) {
+        global $USER, $CFG, $DB, $SITE;
 
         $user = $DB->get_record('user', array('id' => $issuedcert->userid));
-        if (!empty($emails)) {
+        if (!empty($teachersinfo)) {
 
             $url = new moodle_url($CFG->wwwroot . '/mod/customdocument/view.php',
                                 array('id' => $this->coursemodule->id, 'tab' => self::ISSUED_CERTIFCADES_VIEW));
 
-            foreach ($emails as $email) {
-                $email = trim($email);
+            foreach ($teachersinfo as $teacherinfo) {
+                $email = trim($teacherinfo->email);
                 if (validate_email($email)) {
                     $file = $this->get_issue_file($issuedcert);
                     if ($file) { // Put in a tmp dir, for e-mail attachament.
@@ -1021,10 +1091,12 @@ class customdocument {
                     $destination->id = rand(-10, -1);
 
                     $info = new stdClass();
+                    $info->username = $teacherinfo->username;
                     $info->student = fullname($user);
                     $info->course = format_string($this->get_instance()->coursename, true);
                     $info->document = format_string($this->get_instance()->name, true);
                     $info->url = $url->out();
+                    $info->sitefullname = $SITE->fullname;
                     $from = $info->student;
                     $postsubject = get_string('awardedsubject', 'customdocument', $info);
 
@@ -1171,6 +1243,7 @@ class customdocument {
                 // Read contents.
                 if ($firstpageimagefile) {
                     $tmpfilename = $firstpageimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'first_image_');
+
                     $pdf->Image($tmpfilename, 0, 0, $this->get_instance()->width, $this->get_instance()->height);
                     @unlink($tmpfilename);
                 } else {
@@ -1180,10 +1253,9 @@ class customdocument {
 
             // Writing text.
             $pdf->SetXY($this->get_instance()->certificatetextx, $this->get_instance()->certificatetexty);
-            $certTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->certificatetext);
+            $certTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->certificatetext, 1);
 
-            $pdf->writeHTMLCell(0, 0, '', '', $certTextVar , 0, 0, 0,
-                                true, 'C');
+            $pdf->writeHTMLCell(0, 0, '', '', $certTextVar , 0, 0, 0, true, 'C');
 
             // Print QR code in first page (if enable).
             if (!empty($this->get_instance()->qrcodefirstpage) && !empty($this->get_instance()->printqrcode)) {
@@ -1210,8 +1282,9 @@ class customdocument {
                 }
                 if (!empty($this->get_instance()->secondpagetext)) {
                     $pdf->SetXY($this->get_instance()->secondpagex, $this->get_instance()->secondpagey);
-                    $pdf->writeHTMLCell(0, 0, '', '', $this->get_certificate_text($issuecert, $this->get_instance()->secondpagetext), 0,
-                                        0, 0, true, 'C');
+                    $secondpageTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->secondpagetext, 2);
+
+                    $pdf->writeHTMLCell(0, 0, '', '', $secondpageTextVar , 0, 0, 0, true, 'C');
                 }
             }
 
@@ -1385,7 +1458,7 @@ class customdocument {
      * @param $issuecert The issue certificate object
      */
     public function send_certificade_email(stdClass $issuecert) { // previously protected
-        global $DB, $CFG;
+        global $DB, $CFG, $SITE;
 
         $user = $DB->get_record('user', array('id' => $issuecert->userid));
         if (!$user) {
@@ -1394,8 +1467,10 @@ class customdocument {
 
         $info = new stdClass();
         $info->username = format_string(fullname($user), true);
-        $info->certificate = format_string($issuecert->certificatename, true);
+        // $certificatename = explode('-', $issuecert->certificatename);
+        $info->certificate = format_string($this->get_instance()->name, true);
         $info->course = format_string($this->get_instance()->coursename, true);
+        $info->sitefullname = $SITE->fullname;
 
         $subject = get_string('emailstudentsubject', 'customdocument', $info);
         $message = get_string('emailstudenttext', 'customdocument', $info) . "\n";
@@ -1555,7 +1630,7 @@ class customdocument {
      * @param string $certtext The certificate text without substitutions
      * @return string Return certificate text with all substutions
      */
-    protected function get_certificate_text($issuecert, $certtext = null) {
+    protected function get_certificate_text($issuecert, $certtext = null, $itemid = null) {
         global $DB, $CFG;
 
         $user = get_complete_user_data('id', $issuecert->userid);
@@ -1654,13 +1729,13 @@ class customdocument {
         //     $a->hours = '';
         // }
 
-        $teachers = $this->get_teachers();
+        $teachers = $this->get_teachers(true);
         if (empty($teachers)) {
             $teachers = '';
         } else {
             $t = array();
             foreach ($teachers as $teacher) {
-                $t[] = content_to_text($teacher->rolename . ': ' . $teacher->username, FORMAT_MOODLE);
+                $t[] = content_to_text($teacher->rolename . get_string('colon', 'customdocument') . $teacher->username, FORMAT_MOODLE);
             }
             $a->teachers = implode("<br>", $t);
         }
@@ -1722,6 +1797,8 @@ class customdocument {
         if ($search) {
             $certtext = str_replace($search, $replace, $certtext);
         }
+
+        $certtext = file_rewrite_pluginfile_urls($certtext, 'pluginfile.php', $this->context->id, 'mod_customdocument', 'certimage', $itemid);
 
         $certtext = format_text($certtext, FORMAT_HTML, array('noclean' => true));
 
@@ -1924,14 +2001,21 @@ class customdocument {
      * takes in userid as a parameter and then do a query to the database
      * and return the value as a string
      */
-    protected function getGroupData ($userid) {
+    protected function getGroupData ($userid, $courseid = null) {
         global $DB;
 
         // sql query to get the group names from the database
-        $sql = 'SELECT g.name as groupname FROM {groups} g INNER JOIN {groups_members} gm ON gm.groupid = g.id WHERE gm.userid = :userid';
+        if(empty($courseid)){
+            $sql = 'SELECT g.name as groupname FROM {groups} g INNER JOIN {groups_members} gm ON gm.groupid = g.id WHERE gm.userid = :userid';
+            $param = array('userid' => $userid);
+        }
+        else{
+            $sql = 'SELECT g.name as groupname FROM {groups} g INNER JOIN {groups_members} gm ON gm.groupid = g.id WHERE gm.userid = :userid AND g.courseid = :courseid';
+            $param = array('userid' => $userid, 'courseid' => $courseid);
+        }
         // executing the query using the function get_records_sql which return an array of objects
         // with the first field of the table as an index which in this case is id of the group
-        $groupData = $DB->get_records_sql($sql, array('userid' => $userid));
+        $groupData = $DB->get_records_sql($sql, $param);
 
         // using array_values function to change the index of the array to 0,1,3 ....
         // previously was like 64,65,66 .... etc
@@ -1942,13 +2026,10 @@ class customdocument {
         for ($i=0; $i < count($groupData); $i++) {
             $groupName[] = $groupData[$i]->groupname;
         }
-        $groupNames = implode(',', $groupName);
-        return $groupNames;
 
         // converting the array to a single string and then returning back
-        // $group_names_string = implode(' , ', $groupName);
-
-
+        $groupNames = implode(',', $groupName);
+        return $groupNames;
     }
 
     /**
@@ -2230,7 +2311,7 @@ class customdocument {
             foreach ($gradeitems as $gradeitem) {
                 if (!empty($gradeitem->outcomeid)) {
                     $itemmodule = $gradeitem->itemmodule;
-                    $printoutcome[$gradeitem->id] = $itemmodule . ': ' . $gradeitem->get_name();
+                    $printoutcome[$gradeitem->id] = $itemmodule . get_string('colon', 'customdocument') . $gradeitem->get_name();
                 }
             }
         }
@@ -2265,7 +2346,7 @@ class customdocument {
             $outcomeinfo->name = $gradeitem->get_name();
             $outcome = new grade_grade(array('itemid' => $gradeitem->id, 'userid' => $userid));
             $outcomeinfo->grade = grade_format_gradevalue($outcome->finalgrade, $gradeitem, true, GRADE_DISPLAY_TYPE_REAL);
-            return $outcomeinfo->name . ': ' . $outcomeinfo->grade;
+            return $outcomeinfo->name . get_string('colon', 'customdocument') . $outcomeinfo->grade;
         }
 
         return '';

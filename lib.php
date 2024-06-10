@@ -302,7 +302,7 @@ function customdocument_pluginfile($course, $cm, $context, $filearea, $args, $fo
     global $DB;
 
     if ($filearea == 'tmp') {
-        // Beacuse bug #141 forceloginforprofileimage=enabled by passing.
+        // Because bug #141 forceloginforprofileimage=enabled by passing.
 
         $filename = array_shift($args);
         $fs = get_file_storage();
@@ -312,6 +312,18 @@ function customdocument_pluginfile($course, $cm, $context, $filearea, $args, $fo
             send_stored_file($file, null, 0, false);
         }
 
+    } else if ($filearea == 'certimage') {
+        // Because bug #141 forceloginforprofileimage=enabled by passing.
+
+        $itemid = $args[0];
+        $filename = $args[1];
+        $fs = get_file_storage();
+
+        $file = $fs->get_file($context->id, 'mod_customdocument', 'certimage', $itemid, '/', $filename);
+        if ($file) {
+            send_stored_file($file, null, 0, false);
+        }
+    
     } else {
         require_login($course);
 
@@ -416,10 +428,8 @@ function customdocument_send_event($certificate) {
  */
 function customdocument_get_editor_options(stdclass $context) {
 
-    return array('subdirs' => 0, 'maxbytes' => 0,
-        'maxfiles' => 0, 'changeformat' => 0,
-        'context' => $context, 'noclean' => 1,
-        'trusttext' => 0
+    return array('maxfiles' => EDITOR_UNLIMITED_FILES,
+        'noclean' => true, 'context' => $context, 'subdirs' => true
     );
 }
 

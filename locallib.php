@@ -997,7 +997,7 @@ class customdocument {
         foreach ($coursecontactroles as $roleid) {
             $roleid = (int)$roleid;
             $role = $DB->get_record('role', array('id' => $roleid));
-            $users = get_role_users($roleid, $this->context, true);
+            $users = get_role_users($roleid, $this->context, true, '', null, false);
             if ($users) {
                 foreach ($users as $teacher) {
                     $manager = new stdClass();

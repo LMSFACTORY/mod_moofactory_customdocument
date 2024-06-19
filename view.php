@@ -110,7 +110,6 @@ switch ($tab) {
         // avoid the access by adding tab=1 in post/get.
         if ($canmanage) {
             $customdocument->view_issued_certificates($url, $selectedissues);
-
         } else {
             print_error('nopermissiontoviewpage');
         }

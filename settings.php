@@ -73,9 +73,20 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('customdocument/qrcodefirstpage',
             get_string('qrcodefirstpage', 'customdocument'), get_string('qrcodefirstpage_help', 'customdocument'), 0));
 
-    // Certificate back page.
+    // Certificate second page.
     $settings->add(new admin_setting_configcheckbox('customdocument/enablesecondpage',
             get_string('enablesecondpage', 'customdocument'), get_string('enablesecondpage_help', 'customdocument'), 0));
+
+    // Certificate third page.
+    $settings->add(new admin_setting_configcheckbox('customdocument/enablethirdpage',
+            get_string('enablethirdpage', 'customdocument'), get_string('enablethirdpage_help', 'customdocument'), 0));
+    $settings->hide_if('customdocument/enablethirdpage', 'customdocument/enablesecondpage', 'neq', '1');
+
+    // Certificate fourth page.
+    $settings->add(new admin_setting_configcheckbox('customdocument/enablefourthpage',
+            get_string('enablefourthpage', 'customdocument'), get_string('enablefourthpage_help', 'customdocument'), 0));
+    $settings->hide_if('customdocument/enablefourthpage', 'customdocument/enablesecondpage', 'neq', '1');
+    $settings->hide_if('customdocument/enablefourthpage', 'customdocument/enablethirdpage', 'neq', '1');
 
     // Pagination.
     $settings->add(new admin_setting_configtext('customdocument/perpage', get_string('defaultperpage', 'customdocument'),

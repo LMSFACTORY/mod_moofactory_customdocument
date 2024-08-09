@@ -71,6 +71,10 @@ echo $OUTPUT->header();
                     <td>{{COURSEVERSION}}</td>
                     <td><?php echo get_string('courseversiondesc', 'customdocument') ;?></td>
                 </tr>
+                <tr>
+                    <td>{{COURSECUSTOMFIELD_XXX}}</td>
+                    <td><?php echo get_string('coursecustomfielddesc', 'customdocument') ;?></td>
+                </tr>
                 <!-- Fin de Champs de cours -->
 
             </tbody>

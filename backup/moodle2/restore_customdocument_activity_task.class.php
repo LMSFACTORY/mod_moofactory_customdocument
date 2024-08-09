@@ -58,6 +58,8 @@ class restore_customdocument_activity_task extends restore_activity_task {
         $contents[] = new restore_decode_content('customdocument', array('intro'), 'customdocument');
         $contents[] = new restore_decode_content('customdocument', array('certificatetext'), 'customdocument');
         $contents[] = new restore_decode_content('customdocument', array('secondpagetext'), 'customdocument');
+        $contents[] = new restore_decode_content('customdocument', array('thirdpagetext'), 'customdocument');
+        $contents[] = new restore_decode_content('customdocument', array('fourthpagetext'), 'customdocument');
         return $contents;
     }
 

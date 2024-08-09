@@ -40,14 +40,18 @@ class backup_customdocument_activity_structure_step extends backup_activity_stru
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
+        // ici troisième page
         // Define each element separated.
         $certificate = new backup_nested_element('customdocument', array('id'), array(
                 'name', 'intro', 'introformat', 'timemodified', 'width', 'height', 'certificateimage',
                 'certificatetext', 'certificatetextformat', 'certificatetextx', 'certificatetexty',
                 'coursename', 'coursehours', 'outcome', 'certdate', 'certdatefmt', 'certgrade',
                 'gradefmt', 'emailfrom', 'emailothers', 'emailteachers', 'reportcert', 'delivery',
-                'requiredtime', 'printqrcode', 'qrcodefirstpage', 'codex', 'codey', 'enablesecondpage',
-                'secondpagex', 'secondpagey', 'secondpagetext', 'secondpagetextformat', 'secondimage', 'timestartdatefmt'));
+                'requiredtime', 'printqrcode', 'qrcodefirstpage', 'codex', 'codey',
+                'enablesecondpage', 'secondpagex', 'secondpagey', 'secondpagetext', 'secondpagetextformat', 'secondimage',
+                'enablethirdpage', 'thirdpagex', 'thirdpagey', 'thirdpagetext', 'thirdpagetextformat', 'thirdimage',
+                'enablefourthpage', 'fourthpagex', 'fourthpagey', 'fourthpagetext', 'fourthpagetextformat', 'fourthimage', 'timestartdatefmt'));
+
 
         $issues = new backup_nested_element('issues');
 

@@ -167,7 +167,6 @@ class mod_customdocument_mod_form extends moodleform_mod {
         $mform->addHelpButton('secondpagetext', 'certificatetext', 'customdocument');
         $mform->disabledIf('secondpagetext', 'enablesecondpage', 'eq', 0);
 
-
         // Certificate Position X.
         $mform->addElement('text', 'secondpagex', get_string('secondpagex', 'customdocument'), array('size' => '5'));
         $mform->setType('secondpagex', PARAM_INT);
@@ -184,6 +183,97 @@ class mod_customdocument_mod_form extends moodleform_mod {
         $mform->addHelpButton('secondpagey', 'secondtextposition', 'customdocument');
         $mform->disabledIf('secondpagey', 'enablesecondpage', 'eq', 0);
 
+        // Third page.
+        $mform->addElement('header', 'thirdpageoptions', get_string('thirdpageoptions', 'customdocument'));
+        // Enable back page text.
+
+        $mform->addElement('selectyesno', 'enablethirdpage', get_string('enablethirdpage', 'customdocument'));
+        $mform->setDefault('enablethirdpage', get_config('customdocument', 'enablethirdpage'));
+        $mform->addHelpButton('enablethirdpage', 'enablethirdpage', 'customdocument');
+        $mform->disabledIf('enablethirdpage', 'enablesecondpage', 'eq', 0);
+
+        // Certificate thirdimage file.
+        $mform->addElement('filemanager', 'thirdimage',
+            get_string('thirdimage', 'customdocument'), null,
+            $this->get_filemanager_options_array());
+        $mform->addHelpButton('thirdimage', 'thirdimage', 'customdocument');
+        $mform->disabledIf('thirdimage', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('thirdimage', 'enablethirdpage', 'eq', 0);
+
+        // Certificate thirdText HTML editor.
+        $mform->addElement('editor', 'thirdpagetext',
+            get_string('thirdpagetext', 'customdocument'), null,
+            customdocument_get_editor_options($this->context));
+        $mform->addHelpButton('thirdpagetext', 'certificatetext', 'customdocument');
+        $mform->disabledIf('thirdpagetext', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('thirdpagetext', 'enablethirdpage', 'eq', 0);
+
+        // Certificate Position X.
+        $mform->addElement('text', 'thirdpagex', get_string('thirdpagex', 'customdocument'), array('size' => '5'));
+        $mform->setType('thirdpagex', PARAM_INT);
+        $mform->setDefault('thirdpagex', get_config('customdocument', 'certificatetextx'));
+        $mform->setAdvanced('thirdpagex');
+        $mform->addHelpButton('thirdpagex', 'thirdtextposition', 'customdocument');
+        $mform->disabledIf('thirdpagex', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('thirdpagex', 'enablethirdpage', 'eq', 0);
+
+        // Certificate Position Y.
+        $mform->addElement('text', 'thirdpagey', get_string('thirdpagey', 'customdocument'), array('size' => '5'));
+        $mform->setType('thirdpagey', PARAM_INT);
+        $mform->setDefault('thirdpagey', get_config('customdocument', 'certificatetexty'));
+        $mform->setAdvanced('thirdpagey');
+        $mform->addHelpButton('thirdpagey', 'thirdtextposition', 'customdocument');
+        $mform->disabledIf('thirdpagey', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('thirdpagey', 'enablethirdpage', 'eq', 0);
+        
+        // Fourth page.
+        $mform->addElement('header', 'fourthpageoptions', get_string('fourthpageoptions', 'customdocument'));
+        // Enable back page text.
+
+        $mform->addElement('selectyesno', 'enablefourthpage', get_string('enablefourthpage', 'customdocument'));
+        $mform->setDefault('enablefourthpage', get_config('customdocument', 'enablefourthpage'));
+        $mform->addHelpButton('enablefourthpage', 'enablefourthpage', 'customdocument');
+        $mform->disabledIf('enablefourthpage', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('enablefourthpage', 'enablethirdpage', 'eq', 0);
+
+        // Certificate fourthimage file.
+        $mform->addElement('filemanager', 'fourthimage',
+            get_string('fourthimage', 'customdocument'), null,
+            $this->get_filemanager_options_array());
+        $mform->addHelpButton('fourthimage', 'fourthimage', 'customdocument');
+        $mform->disabledIf('fourthimage', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('fourthimage', 'enablethirdpage', 'eq', 0);
+        $mform->disabledIf('fourthimage', 'enablefourthpage', 'eq', 0);
+
+        // Certificate thirdText HTML editor.
+        $mform->addElement('editor', 'fourthpagetext',
+            get_string('fourthpagetext', 'customdocument'), null,
+            customdocument_get_editor_options($this->context));
+        $mform->addHelpButton('fourthpagetext', 'certificatetext', 'customdocument');
+        $mform->disabledIf('fourthpagetext', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('fourthpagetext', 'enablethirdpage', 'eq', 0);
+        $mform->disabledIf('fourthpagetext', 'enablefourthpage', 'eq', 0);
+
+        // Certificate Position X.
+        $mform->addElement('text', 'fourthpagex', get_string('fourthpagex', 'customdocument'), array('size' => '5'));
+        $mform->setType('fourthpagex', PARAM_INT);
+        $mform->setDefault('fourthpagex', get_config('customdocument', 'certificatetextx'));
+        $mform->setAdvanced('fourthpagex');
+        $mform->addHelpButton('fourthpagex', 'fourthtextposition', 'customdocument');
+        $mform->disabledIf('fourthpagex', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('fourthpagex', 'enablethirdhpage', 'eq', 0);
+        $mform->disabledIf('fourthpagex', 'enablefourthpage', 'eq', 0);
+
+        // Certificate Position Y.
+        $mform->addElement('text', 'fourthpagey', get_string('fourthpagey', 'customdocument'), array('size' => '5'));
+        $mform->setType('fourthpagey', PARAM_INT);
+        $mform->setDefault('fourthpagey', get_config('customdocument', 'certificatetexty'));
+        $mform->setAdvanced('fourthpagey');
+        $mform->addHelpButton('fourthpagey', 'fourthtextposition', 'customdocument');
+        $mform->disabledIf('fourthpagey', 'enablesecondpage', 'eq', 0);
+        $mform->disabledIf('fourthpagey', 'enablethirdpage', 'eq', 0);
+        $mform->disabledIf('fourthpagey', 'enablefourthpage', 'eq', 0);
+        
         // Variable options.
         $mform->addElement('header', 'variablesoptions', get_string('variablesoptions', 'customdocument'));
         // Certificate Alternative Course Name.
@@ -357,7 +447,7 @@ class mod_customdocument_mod_form extends moodleform_mod {
             $data['certificatetext'] = array('text' => $newtext , 'itemid' => $draftid_editor, 'format' => FORMAT_HTML);
 
             // Second page.
-            // Get Back image.
+            // Get second image.
             $secondimagedraftitemid = file_get_submitted_draft_itemid('secondimage');
             // Get secondimage filearea info.
             $secondimagefileinfo = customdocument::get_certificate_secondimage_fileinfo($this->context);
@@ -366,14 +456,6 @@ class mod_customdocument_mod_form extends moodleform_mod {
                             $secondimagefileinfo['itemid'],
                             $this->get_filemanager_options_array());
             $data['secondimage'] = $secondimagedraftitemid;
-
-            // Get backpage text.
-            // if (!empty($data['secondpagetext'])) {
-            //     $data['secondpagetext'] = array('text' => $data['secondpagetext'], 'format' => FORMAT_HTML);
-            // } else {
-            //     $data['secondpagetext'] = array('text' => '', 'format' => FORMAT_HTML);
-            // }
-
 
             $text = $data['secondpagetext'];
             $draftid_editor = file_get_submitted_draft_itemid('secondpagetext');
@@ -389,9 +471,61 @@ class mod_customdocument_mod_form extends moodleform_mod {
 
             $data['secondpagetext'] = array('text' => $newtext , 'itemid' => $draftid_editor, 'format' => FORMAT_HTML);
 
+            // Third page.
+            // Get third image.
+            $thirdimagedraftitemid = file_get_submitted_draft_itemid('thirdimage');
+            // Get thirdimage filearea info.
+            $thirdimagefileinfo = customdocument::get_certificate_thirdimage_fileinfo($this->context);
+            file_prepare_draft_area($thirdimagedraftitemid, $thirdimagefileinfo['contextid'],
+                            $thirdimagefileinfo['component'], $thirdimagefileinfo['filearea'],
+                            $thirdimagefileinfo['itemid'],
+                            $this->get_filemanager_options_array());
+            $data['thirdimage'] = $thirdimagedraftitemid;
+            
+            $text = $data['thirdpagetext'];
+            $draftid_editor = file_get_submitted_draft_itemid('thirdpagetext');
+            if (empty($text)) {
+                $currenttext = '';
+            } else {
+                $currenttext = $text;
+            }
+            $textfileinfo = customdocument::get_certificate_thirdtext_fileinfo($this->context);
+            $newtext = file_prepare_draft_area($draftid_editor, $textfileinfo['contextid'],
+            $textfileinfo['component'], $textfileinfo['filearea'],
+            $textfileinfo['itemid'], $this->get_filemanager_options_array(), $currenttext);
+
+            $data['thirdpagetext'] = array('text' => $newtext , 'itemid' => $draftid_editor, 'format' => FORMAT_HTML);
+
+            // Fourth page.
+            // Get fourth image.
+            $fourthimagedraftitemid = file_get_submitted_draft_itemid('fourthimage');
+            // Get fourthimage filearea info.
+            $fourthimagefileinfo = customdocument::get_certificate_fourthimage_fileinfo($this->context);
+            file_prepare_draft_area($fourthimagedraftitemid, $fourthimagefileinfo['contextid'],
+                            $fourthimagefileinfo['component'], $fourthimagefileinfo['filearea'],
+                            $fourthimagefileinfo['itemid'],
+                            $this->get_filemanager_options_array());
+            $data['fourthimage'] = $fourthimagedraftitemid;
+            
+            $text = $data['fourthpagetext'];
+            $draftid_editor = file_get_submitted_draft_itemid('fourthpagetext');
+            if (empty($text)) {
+                $currenttext = '';
+            } else {
+                $currenttext = $text;
+            }
+            $textfileinfo = customdocument::get_certificate_fourthtext_fileinfo($this->context);
+            $newtext = file_prepare_draft_area($draftid_editor, $textfileinfo['contextid'],
+            $textfileinfo['component'], $textfileinfo['filearea'],
+            $textfileinfo['itemid'], $this->get_filemanager_options_array(), $currenttext);
+
+            $data['fourthpagetext'] = array('text' => $newtext , 'itemid' => $draftid_editor, 'format' => FORMAT_HTML);
+
         } else { // Load default.
             $data['certificatetext'] = array('text' => '', 'format' => FORMAT_HTML);
             $data['secondpagetext'] = array('text' => '', 'format' => FORMAT_HTML);
+            $data['thirdpagetext'] = array('text' => '', 'format' => FORMAT_HTML);
+            $data['fourthpagetext'] = array('text' => '', 'format' => FORMAT_HTML);
         }
 
         // Completion rules.
@@ -435,13 +569,21 @@ class mod_customdocument_mod_form extends moodleform_mod {
         if (isset($data->certificateimage) && !empty($data->certificateimage)
             && !$this->check_has_files('certificateimage')) {
                 $data->certificateimage = null;
-
         }
 
         if (isset($data->secondimage) && !empty($data->secondimage) &&
-            !$this->check_has_files('secondimage')) {
+        !$this->check_has_files('secondimage')) {
                 $data->secondimage = null;
+        }
 
+        if (isset($data->thirdimage) && !empty($data->thirdimage) &&
+        !$this->check_has_files('thirdimage')) {
+                $data->thirdimage = null;
+        }
+
+        if (isset($data->fourthimage) && !empty($data->fourthimage) &&
+        !$this->check_has_files('fourthimage')) {
+                $data->fourthimage = null;
         }
     }
 

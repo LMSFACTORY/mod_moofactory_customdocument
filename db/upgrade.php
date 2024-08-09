@@ -74,6 +74,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
             $dbman->add_field($table, $field);
         }
 
+
         $field = new xmldb_field('secondpagex', XMLDB_TYPE_INTEGER, '4', null, null, null, '10', 'enablesecondpage');
 
         // Conditionally launch add field secondpagex.
@@ -554,6 +555,96 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
                     }
                 }
             }
+        }
+    }
+
+    if ($oldversion < 2024080600) {
+        $table = new xmldb_table('customdocument');
+        $field = new xmldb_field('enablethirdpage', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'secondimage');
+
+        // Conditionally launch add field enablethirdpage.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+
+        $field = new xmldb_field('thirdpagex', XMLDB_TYPE_INTEGER, '4', null, null, null, '10', 'enablethirdpage');
+
+        // Conditionally launch add field thirdpagex.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('thirdpagey', XMLDB_TYPE_INTEGER, '4', null, null, null, '50', 'thirdpagex');
+
+        // Conditionally launch add field thirdpagey.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('thirdpagetext', XMLDB_TYPE_TEXT, null, null, null, null, null, 'thirdpagey');
+
+        // Conditionally launch add field thirdpagetext.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('thirdpagetextformat', XMLDB_TYPE_TEXT, null, null, null, null, null, 'thirdpagetext');
+
+        // Conditionally launch add field thirdpagetextformat.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('thirdimage', XMLDB_TYPE_TEXT, null, null, null, null, null, 'thirdpagetextformat');
+
+        // Conditionally launch add field thirdimage.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+
+        $field = new xmldb_field('enablefourthpage', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'thirdimage');
+
+        // Conditionally launch add field enablefourthpage.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+
+        $field = new xmldb_field('fourthpagex', XMLDB_TYPE_INTEGER, '4', null, null, null, '10', 'enablefourthpage');
+
+        // Conditionally launch add field fourthpagex.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('fourthpagey', XMLDB_TYPE_INTEGER, '4', null, null, null, '50', 'fourthpagex');
+
+        // Conditionally launch add field fourthpagey.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('fourthpagetext', XMLDB_TYPE_TEXT, null, null, null, null, null, 'fourthpagey');
+
+        // Conditionally launch add field fourthpagetext.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('fourthpagetextformat', XMLDB_TYPE_TEXT, null, null, null, null, null, 'fourthpagetext');
+
+        // Conditionally launch add field fourthpagetextformat.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('fourthimage', XMLDB_TYPE_TEXT, null, null, null, null, null, 'fourthpagetextformat');
+
+        // Conditionally launch add field fourthimage.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
     }
 

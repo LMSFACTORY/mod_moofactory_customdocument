@@ -31,6 +31,7 @@ $string['issued'] = 'Issued';
 $string['coursegrade'] = 'Course Grade';
 $string['awardedto'] = 'Awarded To';
 $string['receiveddate'] = 'Issued Date';
+$string['issueddate'] = 'Déliverance Date';
 $string['grade'] = 'Grade';
 $string['code'] = 'Code';
 $string['report'] = 'Report';
@@ -80,6 +81,31 @@ $string['secondpagey'] = 'Second page content top margin';
 $string['secondtextposition'] = 'Second page content position';
 $string['secondtextposition_help'] = 'The XY coordinates (in millimetres) of the second page content';
 
+// Third page design
+$string['thirdpageoptions'] = 'Third page design';
+$string['enablethirdpage'] = 'Enable document third page';
+$string['enablethirdpage_help'] = 'Enable document third page edition, if is disabled, only document QR code will be printed in third page (if the QR code is enabled)';
+$string['thirdimage'] = 'Third page background image';
+$string['thirdimage_help'] = 'Picture that will be used in the third page background';
+$string['thirdpagetext'] = 'Third page content';
+
+$string['thirdpagex'] = 'Third page content left margin';
+$string['thirdpagey'] = 'Third page content top margin';
+$string['thirdtextposition'] = 'Third page content position';
+$string['thirdtextposition_help'] = 'The XY coordinates (in millimetres) of the third page content';
+
+// Fourth page design
+$string['fourthpageoptions'] = 'Fourth page design';
+$string['enablefourthpage'] = 'Enable document fourth page';
+$string['enablefourthpage_help'] = 'Enable document fourth page edition, if is disabled, only document QR code will be printed in fourth page (if the QR code is enabled)';
+$string['fourthimage'] = 'Fourth page background image';
+$string['fourthimage_help'] = 'Picture that will be used in the fourth page background';
+$string['fourthpagetext'] = 'Fourth page content';
+
+$string['fourthpagex'] = 'Fourth page content left margin';
+$string['fourthpagey'] = 'Fourth page content top margin';
+$string['fourthtextposition'] = 'Fourth page content position';
+$string['fourthtextposition_help'] = 'The XY coordinates (in millimetres) of the fourth page content';
 
 //Merge fields references and formats
 $string['variablesoptions'] = 'Merge fields references and formats';
@@ -104,7 +130,7 @@ $string['qrcodeoptions'] = 'QR Code options';
 $string['printqrcode'] = 'Print Document QR Code';
 $string['printqrcode_help'] = 'Select "Yes" to print document QR Code which is unique to each issued document';
 $string['qrcodefirstpage'] = 'Print QR Code on the first page';
-$string['qrcodefirstpage_help'] = 'Select "yes" to print QR Code on the first page. Select "no" to print it on the second page.';
+$string['qrcodefirstpage_help'] = 'Select "yes" to print QR Code on the first page. Select "no" to print it on the last page.';
 $string['codex'] = 'QR Code horizontal start position';
 $string['codey'] = 'QR Code vertical start position';
 $string['qrcodeposition'] = 'QR Code position on the document';
@@ -242,6 +268,7 @@ $string['coursenamedesc'] = "Full course name";
 $string['coursestartdatedesc'] = "Course start date (as defined in course settings)";
 $string['courseenddatedesc'] = "Course end date (as defined in course settings)";
 $string['courseversiondesc'] = "Course current version";
+$string['coursecustomfielddesc'] = "Course custom fields (can add / edit from admin > courses > Course custom fields), the XXX is the short name of the field and must be capitalized. <br> Example: COURSECUSTOMFIELD_COURSEVERSION for the 'Version' field";
 
 //User profile fields
 $string['userprofilefield'] = "User Profile fields";
@@ -258,7 +285,7 @@ $string['departmentdesc'] = "User departement";
 $string['phone1desc'] = "User phone";
 $string['phone2desc'] = "User mobile phone";
 $string['addressdesc'] = "User Address";
-$string['profile_xxxx_desc'] = "User profile custom fields (can add / edit from admin> users> accounts> Profile fields), the XXX is the short name of the field and must be capitalized. <br> Example: PROFILE_ORGA for the 'My organization' field";
+$string['profile_xxxx_desc'] = "User profile custom fields (can add / edit from admin > users > accounts > Profile fields), the XXX is the short name of the field and must be capitalized. <br> Example: PROFILE_ORGA for the 'My organization' field";
 
 // strings notebook and result
 $string['resulttitle'] = "Grades and outcome";

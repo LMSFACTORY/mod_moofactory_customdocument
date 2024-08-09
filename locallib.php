@@ -188,7 +188,7 @@ class customdocument {
         /******************************************* */
         // Never update exept if the user is manager.
         /******************************************* */
-        $courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
+        $courseversion = $this->get_course_custom_field($this->get_course()->id, 'courseversion', 'text');
         $issuedcerts = $DB->get_records('customdocument_issues', array('certificateid' => $this->get_instance()->id,));
 
         foreach ($issuedcerts as $issuedcert) {
@@ -502,6 +502,28 @@ class customdocument {
             unset($formdata->secondpagetext);
         }
 
+        if (isset($formdata->thirdpagetext['text'])) {
+
+            $fileinfo = self::get_certificate_thirdtext_fileinfo($this->context->id);
+            $update->thirdpagetext = $this->save_upload_file($formdata->thirdpagetext['itemid'], $fileinfo, $formdata->thirdpagetext['text']);
+
+            if (!isset($formdata->thirdpagetextformat)) {
+                $update->thirdpagetextformat = $formdata->thirdpagetext['format'];
+            }
+            unset($formdata->thirdpagetext);
+        }
+
+        if (isset($formdata->fourthpagetext['text'])) {
+
+            $fileinfo = self::get_certificate_fourthtext_fileinfo($this->context->id);
+            $update->fourthpagetext = $this->save_upload_file($formdata->fourthpagetext['itemid'], $fileinfo, $formdata->fourthpagetext['text']);
+
+            if (!isset($formdata->fourthpagetextformat)) {
+                $update->fourthpagetextformat = $formdata->fourthpagetext['format'];
+            }
+            unset($formdata->fourthpagetext);
+        }
+
         if (isset($formdata->certificateimage)) {
             if (!empty($formdata->certificateimage)) {
                 $fileinfo = self::get_certificate_image_fileinfo($this->context->id);
@@ -518,6 +540,24 @@ class customdocument {
             }
         } else {
             $formdata->secondimage = null;
+        }
+
+        if (isset($formdata->thirdimage)) {
+            if (!empty($formdata->thirdimage)) {
+                $fileinfo = self::get_certificate_thirdimage_fileinfo($this->context->id);
+                $formdata->thirdimage = $this->save_upload_file($formdata->thirdimage, $fileinfo);
+            }
+        } else {
+            $formdata->thirdimage = null;
+        }
+
+        if (isset($formdata->fourthimage)) {
+            if (!empty($formdata->fourthimage)) {
+                $fileinfo = self::get_certificate_fourthimage_fileinfo($this->context->id);
+                $formdata->fourthimage = $this->save_upload_file($formdata->fourthimage, $fileinfo);
+            }
+        } else {
+            $formdata->fourthimage = null;
         }
 
         foreach ($formdata as $name => $value) {
@@ -603,6 +643,30 @@ class customdocument {
     }
 
     /**
+     * Get the third page text fileinfo
+     *
+     * @param mixed $context The module context object or id
+     * @return the first page background image fileinfo
+     */
+    public static function get_certificate_thirdtext_fileinfo($context) {
+        $fileinfo = self::get_certificate_text_fileinfo($context);
+        $fileinfo['itemid'] = 3;
+        return $fileinfo;
+    }
+
+    /**
+     * Get the fourth page text fileinfo
+     *
+     * @param mixed $context The module context object or id
+     * @return the first page background image fileinfo
+     */
+    public static function get_certificate_fourthtext_fileinfo($context) {
+        $fileinfo = self::get_certificate_text_fileinfo($context);
+        $fileinfo['itemid'] = 4;
+        return $fileinfo;
+    }
+
+    /**
      * Get the first page background image fileinfo
      *
      * @param mixed $context The module context object or id
@@ -632,6 +696,32 @@ class customdocument {
 
         $fileinfo = self::get_certificate_image_fileinfo($context);
         $fileinfo['itemid'] = 2;
+        return $fileinfo;
+    }
+
+    /**
+     * Get the third page background image fileinfo
+     *
+     * @param mixed $context The module context object or id
+     * @return the third page background image fileinfo
+     */
+    public static function get_certificate_thirdimage_fileinfo($context) {
+
+        $fileinfo = self::get_certificate_image_fileinfo($context);
+        $fileinfo['itemid'] = 3;
+        return $fileinfo;
+    }
+
+    /**
+     * Get the fourth page background image fileinfo
+     *
+     * @param mixed $context The module context object or id
+     * @return the fourth page background image fileinfo
+     */
+    public static function get_certificate_fourthimage_fileinfo($context) {
+
+        $fileinfo = self::get_certificate_image_fileinfo($context);
+        $fileinfo['itemid'] = 4;
         return $fileinfo;
     }
 
@@ -1288,6 +1378,58 @@ class customdocument {
                 }
             }
 
+            if (!empty($this->get_instance()->enablethirdpage) && !empty($this->get_instance()->enablesecondpage)) {
+                $pdf->AddPage();
+                if (!empty($this->get_instance()->thirdimage)) {
+                    // Prepare file record object.
+                    $fileinfo = self::get_certificate_thirdimage_fileinfo($this->context->id);
+                    // Get file.
+                    $thirdimagefile = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                                                    $fileinfo['itemid'], $fileinfo['filepath'], $this->get_instance()->thirdimage);
+
+                    // Read contents.
+                    if (!empty($thirdimagefile)) {
+                        $tmpfilename = $thirdimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'third_image_');
+                        $pdf->Image($tmpfilename, 0, 0, $this->get_instance()->width, $this->get_instance()->height);
+                        @unlink($tmpfilename);
+                    } else {
+                        print_error(get_string('filenotfound', 'customdocument', $this->get_instance()->thirdimage));
+                    }
+                }
+                if (!empty($this->get_instance()->thirdpagetext)) {
+                    $pdf->SetXY($this->get_instance()->thirdpagex, $this->get_instance()->thirdpagey);
+                    $thirdpageTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->thirdpagetext, 2);
+
+                    $pdf->writeHTMLCell(0, 0, '', '', $thirdpageTextVar , 0, 0, 0, true, 'C');
+                }
+            }
+
+            if (!empty($this->get_instance()->enablefourthpage) && !empty($this->get_instance()->enablethirdpage) && !empty($this->get_instance()->enablesecondpage)) {
+                $pdf->AddPage();
+                if (!empty($this->get_instance()->fourthimage)) {
+                    // Prepare file record object.
+                    $fileinfo = self::get_certificate_fourthimage_fileinfo($this->context->id);
+                    // Get file.
+                    $fourthimagefile = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                                                    $fileinfo['itemid'], $fileinfo['filepath'], $this->get_instance()->fourthimage);
+
+                    // Read contents.
+                    if (!empty($fourthimagefile)) {
+                        $tmpfilename = $fourthimagefile->copy_content_to_temp(self::CERTIFICATE_COMPONENT_NAME, 'fourth_image_');
+                        $pdf->Image($tmpfilename, 0, 0, $this->get_instance()->width, $this->get_instance()->height);
+                        @unlink($tmpfilename);
+                    } else {
+                        print_error(get_string('filenotfound', 'customdocument', $this->get_instance()->fourthimage));
+                    }
+                }
+                if (!empty($this->get_instance()->fourthpagetext)) {
+                    $pdf->SetXY($this->get_instance()->fourthpagex, $this->get_instance()->fourthpagey);
+                    $fourthpageTextVar = $this->get_certificate_text($issuecert, $this->get_instance()->fourthpagetext, 2);
+
+                    $pdf->writeHTMLCell(0, 0, '', '', $fourthpageTextVar , 0, 0, 0, true, 'C');
+                }
+            }
+
             if (!empty($this->get_instance()->printqrcode) && empty($this->get_instance()->qrcodefirstpage)) {
                 // Add certificade code using QRcode, in a new page (to print in the back).
                 if (empty($this->get_instance()->enablesecondpage)) {
@@ -1408,7 +1550,7 @@ class customdocument {
             $ismanager = has_capability('mod/customdocument:manage', $this->context, $issuecert->userid);
             if(!$ismanager){
                 // Insert courant course version.
-                $courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
+                $courseversion = $this->get_course_custom_field($this->get_course()->id, 'courseversion', 'text');
             }
             else{
                 $courseversion = "--";
@@ -1429,7 +1571,7 @@ class customdocument {
         }
     }
 
-    protected function getCustomfield($courseid, $name, $type){
+    protected function get_course_custom_field($courseid, $name, $type){
         global $DB;
     
         switch($type){
@@ -1440,7 +1582,7 @@ class customdocument {
             case "text" :
                 $fieldvalue = "charvalue";
                 break;
-            }
+        }
         $sql = "SELECT cd.$fieldvalue FROM {customfield_data} cd ";
         $sql .= "LEFT JOIN {customfield_field} cf ON cf.id = cd.fieldid ";
         $sql .= "WHERE cd.instanceid = ? AND cf.shortname = ?";
@@ -1449,6 +1591,35 @@ class customdocument {
             array($courseid, $name));
         $value = $record->$fieldvalue;
         return $value;
+    }
+
+    protected function get_course_custom_fields($courseid){
+        global $DB;
+    
+        $coursecustomfields = new stdClass();
+        $sql = "SELECT cd.id, cf.shortname, cf.type, cd.intvalue, cd.charvalue, cd.value FROM {customfield_data} cd ";
+        $sql .= "LEFT JOIN {customfield_field} cf ON cf.id = cd.fieldid ";
+        $sql .= "WHERE cd.instanceid = ?";
+        $records = $DB->get_records_sql(
+            $sql,
+            array($courseid));
+
+        foreach ($records as $record) {
+            switch($record->type){
+                case "select" :
+                case "checkbox" :
+                    $fieldvalue = "intvalue";
+                    break;
+                case "text" :
+                    $fieldvalue = "charvalue";
+                    break;
+                case "textarea" :
+                    $fieldvalue = "value";
+                    break;
+            }
+            $coursecustomfields->{$record->shortname} = $record->$fieldvalue;
+        }
+        return $coursecustomfields;
     }
 
     /**
@@ -1687,6 +1858,7 @@ class customdocument {
             $key = 'profile_' . $key;
             $a->$key = strip_tags($value);
         }
+
         // The course name never change form a certificate to another, useless
         // text mark and atribbute, can be removed.
         $a->coursename = strip_tags($this->get_instance()->coursename);
@@ -1718,8 +1890,13 @@ class customdocument {
         // Merge field for the user course completion date.
         $a->coursecompletiondate = $this->get_course_completion_date($user->id);
         // Merge field for the course version.
-        $a->courseversion = $this->getCustomfield($this->get_course()->id, 'courseversion', 'text');
-
+        $a->courseversion = $this->get_course_custom_field($this->get_course()->id, 'courseversion', 'text');
+        // Getting user custom profiles fields.
+        $coursecustomfields = $this->get_course_custom_fields($this->get_course()->id);
+        foreach ($coursecustomfields as $key => $value) {
+            $key = 'coursecustomfield_' . $key;
+            $a->$key = strip_tags($value);
+        }
 
         // This code stay here only beace legacy support, coursehours variable was removed
         // see issue 61 https://github.com/bozoh/moodle-mod_customdocument/issues/61.

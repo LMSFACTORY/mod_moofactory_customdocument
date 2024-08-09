@@ -32,6 +32,7 @@ $string['issued'] = 'Délivré';
 $string['coursegrade'] = 'Note de la formation';
 $string['awardedto'] = 'Décerné à';
 $string['receiveddate'] = 'Date de réception';
+$string['issueddate'] = 'Date de déliverance';
 $string['grade'] = 'Note';
 $string['code'] = 'Code';
 $string['report'] = 'Rapport';
@@ -61,7 +62,7 @@ $string['infochamps'] = '<a href="{$a}" target="popup" >Cliquez ici pour affiche
 $string['height'] = 'Hauteur du document';
 $string['width'] = 'Largeur du document';
 $string['size'] = 'Taille du document';
-$string['size_help'] = 'Largeur et hauteur (en millimètres) du document (première et seconde page). La taille par défaut est : Portrait A4';
+$string['size_help'] = 'Largeur et hauteur (en millimètres) du document (toutes les pages). La taille par défaut est : Portrait A4';
 $string['textposition'] = 'Position du contenu de la première page';
 $string['textposition_help'] = 'Coordonnées XY (en millimètres) du contenu de la première page du document';
 $string['certificatetextx'] = 'Marge de gauche du contenu de la première page';
@@ -79,6 +80,32 @@ $string['secondpagex'] = 'Marge de gauche du contenu de la seconde page';
 $string['secondpagey'] = 'Marge du haut du contenu de la seconde page';
 $string['secondtextposition'] = 'Position du contenu de la seconde page';
 $string['secondtextposition_help'] = 'Coordonnées XY (en millimètres) du contenu de la seconde page du document';
+
+// Conception de la troisième page
+$string['thirdpageoptions'] = 'Conception de la troisième page';
+$string['enablethirdpage'] = 'Activer la troisième page du document';
+$string['enablethirdpage_help'] = 'Si vous souhaitez ajouter une troisième page au document, activez cette option.';
+$string['thirdimage'] = 'Image de fond de la troisième page du document';
+$string['thirdimage_help'] = 'Image qui sera utilisée en arrière plan de la troisième page du document.';
+$string['thirdpagetext'] = 'Contenu de la troisième page';
+
+$string['thirdpagex'] = 'Marge de gauche du contenu de la troisième page';
+$string['thirdpagey'] = 'Marge du haut du contenu de la troisième page';
+$string['thirdtextposition'] = 'Position du contenu de la troisième page';
+$string['thirdtextposition_help'] = 'Coordonnées XY (en millimètres) du contenu de la troisième page du document';
+
+// Conception de la quatrième page
+$string['fourthpageoptions'] = 'Conception de la quatrième page';
+$string['enablefourthpage'] = 'Activer la quatrième page du document';
+$string['enablefourthpage_help'] = 'Si vous souhaitez ajouter une quatrième page au document, activez cette option.';
+$string['fourthimage'] = 'Image de fond de la quatrième page du document';
+$string['fourthimage_help'] = 'Image qui sera utilisée en arrière plan de la quatrième page du document.';
+$string['fourthpagetext'] = 'Contenu de la quatrième page';
+
+$string['fourthpagex'] = 'Marge de gauche du contenu de la quatrième page';
+$string['fourthpagey'] = 'Marge du haut du contenu de la quatrième page';
+$string['fourthtextposition'] = 'Position du contenu de la quatrième page';
+$string['fourthtextposition_help'] = 'Coordonnées XY (en millimètres) du contenu de la quatrième page du document';
 
 //Références et formats des champs de fusion
 $string['variablesoptions'] = 'Références et format des champs de fusion';
@@ -103,7 +130,7 @@ $string['qrcodeoptions'] = 'Options du QR code';
 $string['printqrcode'] = 'Imprimer le QR code du document';
 $string['printqrcode_help'] = 'Sélectionnez "Oui" pour imprimer un QR code unique pour chaque document généré.';
 $string['qrcodefirstpage'] = 'Imprimer le QR code sur la première page';
-$string['qrcodefirstpage_help'] = 'Sélectionnez "oui" pour imprimer le QR code sur la première page et "non" pour l\'imprimer sur la seconde page.';
+$string['qrcodefirstpage_help'] = 'Sélectionnez "oui" pour imprimer le QR code sur la première page et "non" pour l\'imprimer sur la dernière page.';
 $string['codex'] = 'Position initiale horizontale du QR code';
 $string['codey'] = 'Position initiale verticale du QR code';
 $string['qrcodeposition'] = 'Position du QR code';
@@ -234,12 +261,12 @@ $string['thdescription'] = "Description";
 $string['colon'] = " : ";
 
 //Paramètres du cours
-// $string['coursefield'] = "Paramètres du cours";
 $string['modulecoursetitle'] = "Paramètres du cours";
 $string['coursenamedesc'] = "Nom complet du cours";
 $string['coursestartdatedesc'] = "Date du début de cours (paramètres du cours)";
 $string['courseenddatedesc'] = "Date du fin de cours (paramètres du cours)";
 $string['courseversiondesc'] = "Version courante du cours";
+$string['coursecustomfielddesc'] = "Champs personnalisés de cours (définis par l'administrateur du site), le XXX correspond au nom abrégé du champ et doit être mis en majuscule.<br>Exemple : COURSECUSTOMFIELD_COURSEVERSION pour le champ 'Version'";
 
 //Champs de profil de l'utilisateur
 $string['userprofilefield'] = "Champs de profil de l'utilisateur";
@@ -256,7 +283,7 @@ $string['departmentdesc'] = "Département de l'utilisateur";
 $string['phone1desc'] = "Téléphone de l'utilisateur";
 $string['phone2desc'] = "Téléphone mobile de l'utilisateur";
 $string['addressdesc'] = "Adresse de l'utilisateur";
-$string['profile_xxxx_desc'] = "Champs personnalisés de profil de l'utilisateur (définis par l'administrateur du site), le XXX correspond au nom abrégé du champ et doit être mis en majuscule. <br> Exemple : PROFILE_ORGA pour le champ 'Mon organisation'";
+$string['profile_xxxx_desc'] = "Champs personnalisés de profil de l'utilisateur (définis par l'administrateur du site), le XXX correspond au nom abrégé du champ et doit être mis en majuscule.<br>Exemple : PROFILE_ORGA pour le champ 'Mon organisation'";
 // strings notebook and result
 $string['resulttitle'] = "Notes et resultats";
 $string['gradesdesc'] = "Note sélectionnée dans les 'Références et formats des champs de fusion' (note du cours, note d'une activité…)";

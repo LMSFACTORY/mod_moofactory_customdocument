@@ -1024,32 +1024,34 @@ class customdocument {
         global $DB;
 
         $cm = $DB->get_record('course_modules', array('id' => $moduleid));
-        $module = $DB->get_record('modules', array('id' => $cm->module));
-        $gradeitem = grade_get_grades($this->get_course()->id, 'mod', $module->name, $cm->instance, $userid);
-        if ($gradeitem) {
-            $item = new grade_item();
-            $itemproperties = reset($gradeitem->items);
-            foreach ($itemproperties as $key => $value) {
-                $item->$key = $value;
+        if($cm != false){
+            $module = $DB->get_record('modules', array('id' => $cm->module));
+            $gradeitem = grade_get_grades($this->get_course()->id, 'mod', $module->name, $cm->instance, $userid);
+            if ($gradeitem) {
+                $item = new grade_item();
+                $itemproperties = reset($gradeitem->items);
+                foreach ($itemproperties as $key => $value) {
+                    $item->$key = $value;
+                }
+                $modinfo = new stdClass();
+                $modinfo->name = utf8_decode($DB->get_field($module->name, 'name', array('id' => $cm->instance)));
+                $grade = $item->grades[$userid]->grade;
+                $item->gradetype = GRADE_TYPE_VALUE;
+                $item->courseid = $this->get_course()->id;
+
+                $modinfo->points = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_REAL, $decimals = 2);
+                $modinfo->percentage = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals = 2);
+                $modinfo->letter = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_LETTER, $decimals = 0);
+
+                $modinfo->hidden = $item->grades[$userid]->hidden;
+
+                if ($grade) {
+                    $modinfo->dategraded = $item->grades[$userid]->dategraded;
+                } else {
+                    $modinfo->dategraded = time();
+                }
+                return $modinfo;
             }
-            $modinfo = new stdClass();
-            $modinfo->name = utf8_decode($DB->get_field($module->name, 'name', array('id' => $cm->instance)));
-            $grade = $item->grades[$userid]->grade;
-            $item->gradetype = GRADE_TYPE_VALUE;
-            $item->courseid = $this->get_course()->id;
-
-            $modinfo->points = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_REAL, $decimals = 2);
-            $modinfo->percentage = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_PERCENTAGE, $decimals = 2);
-            $modinfo->letter = grade_format_gradevalue($grade, $item, true, GRADE_DISPLAY_TYPE_LETTER, $decimals = 0);
-
-            $modinfo->hidden = $item->grades[$userid]->hidden;
-
-            if ($grade) {
-                $modinfo->dategraded = $item->grades[$userid]->dategraded;
-            } else {
-                $modinfo->dategraded = time();
-            }
-            return $modinfo;
         }
 
         return false;
@@ -2549,7 +2551,8 @@ class customdocument {
                         require_once($CFG->dirroot . '/user/profile/field/' . $field->datatype . '/field.class.php');
                         $newfield = 'profile_field_' . $field->datatype;
                         $formfield = new $newfield($field->id, $userid);
-                        if ($formfield->is_visible() && !$formfield->is_empty()) {
+                        // if ($formfield->is_visible() && !$formfield->is_empty()) {
+                        if (!$formfield->is_empty()) {
                             if ($field->datatype == 'checkbox') {
                                 $usercustomfields->{$field->shortname} = (
                                     $formfield->data == 1 ? get_string('yes') : get_string('no')

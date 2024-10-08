@@ -55,3 +55,7 @@ and download the zip, uncompress this zip and extract the folder. The folder wil
 Place this folder in your mod folder in your Moodle directory.
 
 > The reason this is not the recommended method is due to the fact you have to over-write the contents of this folder to apply any future updates to the customdocument module. In the above method there is a simple command to update the files.
+
+
+## More information
+By default, teacher are receiving copy of the students documents if the option « Notifier et envoyer une copie par courriel aux enseignants et superviseurs de l'apprenant » is activated. If you want to create a role that can receive them, please tick permissions : « mod/customdocument:manage » and « mod/customdocument:canreceivenotifications ».

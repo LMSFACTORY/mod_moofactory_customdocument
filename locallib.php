@@ -1064,10 +1064,22 @@ class customdocument {
      *
      * @return string UUID
      */
+    // protected function get_issue_uuid() {
+    //     global $CFG;
+    //     require_once($CFG->libdir . '/horde/framework/Horde/Support/Uuid.php');
+    //     return (string)new Horde_Support_Uuid();
+    // }
+
+    /**
+     * Generate a V4 UUID.
+     * @see https://tools.ietf.org/html/rfc4122
+     *
+     * @return string UUID
+     */
     protected function get_issue_uuid() {
         global $CFG;
-        require_once($CFG->libdir . '/horde/framework/Horde/Support/Uuid.php');
-        return (string)new Horde_Support_Uuid();
+        require_once($CFG->libdir . '/classes/uuid.php');
+        return \core\uuid::generate();
     }
 
     /**

@@ -35,7 +35,14 @@ require_once("$CFG->dirroot/mod/customdocument/locallib.php");
 
 $id = required_param('id', PARAM_INT); // Course Module ID.
 $action = optional_param('action', '', PARAM_ALPHA);
-$tab = optional_param('tab', customdocument::DEFAULT_VIEW, PARAM_INT);
+
+if($action === "get"){
+    $tab = optional_param('tab', customdocument::DEFAULT_VIEW, PARAM_INT);
+}
+else{
+    $tab = optional_param('tab', customdocument::ISSUED_CERTIFCADES_VIEW, PARAM_INT);
+}
+
 $type = optional_param('type', '', PARAM_ALPHA);
 $page = optional_param('page', 0, PARAM_INT);
 $perpage = optional_param('perpage', get_config('customdocument', 'perpage'), PARAM_INT);
@@ -104,6 +111,9 @@ $completion->set_module_viewed($cm);
 $PAGE->set_title(format_string($certificate->name));
 $PAGE->set_heading(format_string($course->fullname));
 
+if(!$canmanage){
+    $tab = customdocument::DEFAULT_VIEW;
+}
 switch ($tab) {
     case $customdocument::ISSUED_CERTIFCADES_VIEW :
         // Verify if user can access this page

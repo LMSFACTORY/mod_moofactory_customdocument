@@ -585,6 +585,16 @@ class mod_customdocument_mod_form extends moodleform_mod {
         !$this->check_has_files('fourthimage')) {
                 $data->fourthimage = null;
         }
+
+        if(is_null($data->secondpagetext["text"])){
+            $data->secondpagetext["text"] = "";
+        }
+        if(is_null($data->thirdpagetext["text"])){
+            $data->thirdpagetext["text"] = "";
+        }
+        if(is_null($data->fourthpagetext["text"])){
+            $data->fourthpagetext["text"] = "";
+        }
     }
 
     /**

@@ -40,7 +40,6 @@ class backup_customdocument_activity_structure_step extends backup_activity_stru
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
-        // ici troisième page
         // Define each element separated.
         $certificate = new backup_nested_element('customdocument', array('id'), array(
                 'name', 'intro', 'introformat', 'timemodified', 'width', 'height', 'certificateimage',

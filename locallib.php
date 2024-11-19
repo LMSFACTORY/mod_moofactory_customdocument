@@ -909,7 +909,7 @@ class customdocument {
         $gradecolumn = $this->get_instance()->certgrade;
 
         if ($gradecolumn) {
-            $table->head[] = get_string('grade');
+            $table->head[] = get_string('grade', 'customdocument');
             $table->align[] = 'center';
             $table->size[] = '';
         }
@@ -2751,7 +2751,7 @@ class customdocument {
         // Get all users that can manage this certificate to exclude them from the report.
         $certmanagers = get_users_by_capability($this->context, 'mod/customdocument:manage', 'u.id');
 
-        $sql = "SELECT ci.code, ci.id AS ciid, ci.timecreated, ci.timedisabled, ci.haschange, ci.pathnamehash, u.id, u.firstname, u.lastname ";
+        $sql = "SELECT ci.code, ci.id AS ciid, ci.timecreated, ci.timedisabled, ci.haschange, ci.pathnamehash, u.id, u.firstname, u.lastname ,u.picture ,u.firstnamephonetic ,u.lastnamephonetic ,u.middlename ,u.alternatename ,u.imagealt ,u.email ";
         $sql .= "FROM {user} u INNER JOIN {customdocument_issues} ci ON u.id = ci.userid ";
         $sql .= "WHERE u.deleted = 0 AND ci.certificateid = :certificateid AND timedeleted IS NULL ";
         $sql .= "ORDER BY {$sort}";
@@ -2840,7 +2840,7 @@ class customdocument {
             $table->width = "95%";
             $table->tablealign = "center";
 
-            $table->head = array(' ', get_string('fullname'), get_string('grade'));
+            $table->head = array(' ', get_string('fullname'), get_string('grade', 'customdocument'));
             $table->align = array("left", "left", "center");
             $table->size = array('1%', '89%', '10%');
 
@@ -3209,7 +3209,7 @@ class customdocument {
             $table->width = "95%";
             $table->tablealign = "center";
             $selectAllchkBox = html_writer::checkbox('selectallusersdocuments', '',false);
-            $table->head = array($selectAllchkBox, get_string('firstname', 'customdocument'), get_string('lastname', 'customdocument'), get_string('grade'));
+            $table->head = array($selectAllchkBox, get_string('firstname', 'customdocument'), get_string('lastname', 'customdocument'), get_string('grade', 'customdocument'));
             $table->align = array("left", "left", "left", "center");
             $table->size = array('1%', '10%','10%','45%');
 

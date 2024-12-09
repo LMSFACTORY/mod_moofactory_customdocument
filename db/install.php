@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 function xmldb_customdocument_install() {
     // Creation of the course custom fields in the 'Version' category.
-    require_login();
+    // require_login();
 
     $handler = core_course\customfield\course_handler::create();
     $categoryid = $handler->create_category(get_string('version_category', 'customdocument'));
@@ -37,9 +37,9 @@ function xmldb_customdocument_install() {
         $field = \core_customfield\field_controller::create(0, (object)['type' => $type], $category);
 
         $handler = $field->get_handler();
-        if (!$handler->can_configure()) {
-            print_error('nopermissionconfigure', 'core_customfield');
-        }
+        // if (!$handler->can_configure()) {
+        //     print_error('nopermissionconfigure', 'core_customfield');
+        // }
 
         $data = new stdClass();
         $data->name = get_string('courseversion', 'customdocument');

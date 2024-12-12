@@ -25,20 +25,20 @@ use mod_customdocument\customdocumentlib;
 
 defined('MOODLE_INTERNAL') || die();
 
-class send_mail_restriction extends \core\task\scheduled_task {
+class generate_restriction extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task (shown to admins).
      *
      * @return string
      */
     public function get_name() {
-        return get_string('sendmailrestriction', 'mod_customdocument');
+        return get_string('generaterestriction', 'mod_customdocument');
     }
 
     /**
      * Run assignment cron.
      */
     public function execute() {
-        customdocumentlib::sendmailrestriction();
+        customdocumentlib::generaterestriction();
     }
 }

@@ -386,6 +386,8 @@ class mod_customdocument_mod_form extends moodleform_mod {
             3 => get_string('nodelivering','customdocument'),
             4 => get_string('emailoncompletion', 'customdocument'),
             5 => get_string('emailonrestriction', 'customdocument'),
+            6 => get_string('generateoncompletion', 'customdocument'),
+            7 => get_string('generateonrestriction', 'customdocument'),
         );
         $mform->addElement('select', 'delivery', get_string('delivery', 'customdocument'), $deliveryoptions);
         $mform->setDefault('delivery', 0);

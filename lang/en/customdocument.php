@@ -151,6 +151,8 @@ $string['emailcertificate'] = 'Send to student by email';
 $string['nodelivering'] = 'No delivering, user will receive this document using others ways';
 $string['emailoncompletion'] = 'Send to student email upon course completion';
 $string['emailonrestriction'] = 'Send to student email after lifting the access restriction';
+$string['generateoncompletion'] = 'Generate document upon course completion, without send';
+$string['generateonrestriction'] = 'Generate document after lifting the access restriction, without send';
 
 // Issue a document or test document
 $string['standardview'] = 'Issue a test document';
@@ -336,4 +338,4 @@ $string['version_category'] = 'Version';
 $string['courseversion'] = 'Course current version';
 
 // cron task
-$string['sendmailrestriction'] = 'Sending emails after restrictions are lifted';
+$string['generaterestriction'] = 'Sending emails after restrictions are lifted';

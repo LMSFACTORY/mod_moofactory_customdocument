@@ -32,25 +32,30 @@ class observer {
      *
      * @param \core\event\course_completed $event
      */
-    public static function sendemails(\core\event\course_completed $event) {
+    public static function sendemailsorgenerate(\core\event\course_completed $event) {
         global $DB, $CFG;
         require_once ($CFG->dirroot . '/mod/customdocument/locallib.php');
-        if ($rec = $DB->get_record('customdocument', ['delivery' => 4, 'course' => $event->courseid])) {
-            $cm = get_coursemodule_from_instance( 'customdocument', $rec->id, $event->courseid );
+
+        $sql = "SELECT cd.* FROM {customdocument} cd ";
+        $sql .= "JOIN {course_modules} cm ON cd.id = cm.instance ";
+        $sql .= "JOIN {modules} m ON m.id = cm.module ";
+        $sql .= "WHERE m.name = ? AND cm.course = ? AND (cd.delivery = ? OR cd.delivery = ?) AND cm.deletioninprogress = 0;";
+        $customdocs = $DB->get_records_sql($sql, array('customdocument', $event->courseid, 4, 6));
+
+        foreach ($customdocs as $customdoc) {
+            $cm = get_coursemodule_from_instance( 'customdocument', $customdoc->id, $event->courseid );
             $context = \context_module::instance($cm->id);
             $course = $DB->get_record('course', array('id' => $cm->course));
             $user = $DB->get_record('user', array('id' => $event->relateduserid));
             $customdocument = new \customdocument($context, $cm, $course);
             $issuecert = $customdocument->get_issue($user);
+            // If delivery option is 4, send email with certificate.
+            // If delivery option is 6, just generate certificate and no email is sent.
             if ($customdocument->get_issue_file($issuecert)) {
-                $ret = $customdocument->send_certificade_email($issuecert);
+                if ($customdoc->delivery == 4) {
+                    $ret = $customdocument->send_certificade_email($issuecert);
+                }
             }
         }
     }
-
-    // public static function mylogger($name, $obj) {
-    //     $line = "$name\n----------------------------\n" . print_r($obj, true) . "\n=============================\n";
-    //     @file_put_contents(realpath(".") ."/log.txt", $line, FILE_APPEND | LOCK_EX);
-    // }
-
 }

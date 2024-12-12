@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $observers = array(
 	array(
 		'eventname' => '\core\event\course_completed',
-        'callback' => '\mod_customdocument\observer::sendemails'
+        'callback' => '\mod_customdocument\observer::sendemailsorgenerate'
     )
 );

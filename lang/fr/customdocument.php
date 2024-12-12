@@ -142,7 +142,6 @@ $string['emailteachers'] = 'Notifier et envoyer une copie par courriel aux ensei
 $string['emailteachers_help'] = 'Si "Oui", chaque fois qu\'un document sera généré, les rôles ayant la capacité "mod/customdocument:canreceivenotifications" recevront un courriel avec le document en pièce jointe.';
 $string['emailothers'] = 'Autres adresses courriels à notifier';
 $string['emailothers_help'] = 'Entrez ici, séparées par une virgule, les adresses courriel qui doivent être alertées chaque fois qu\'un document sera généré.';
-
 $string['delivery'] = 'Comportement lors de l\'émission des documents par l\'étudiant';
 $string['delivery_help'] = 'Choisissez ici la façon dont vous souhaitez que vos étudiants obtiennent leur document lorsqu\'ils cliquent sur le bouton "Obtenir mon document".
 <br>En retournant sur l\'activité, l\'apprenant verra la date à laquelle son document a été émis.';
@@ -152,6 +151,8 @@ $string['emailcertificate'] = 'Envoi par courriel';
 $string['nodelivering'] = 'Pas d\'émission du document, l\'utilisateur le recevra autrement';
 $string['emailoncompletion'] = 'Envoi automatique par courriel après achevement du cours';
 $string['emailonrestriction'] = 'Envoi automatique par courriel après levée de la restriction d\'accès';
+$string['generateoncompletion'] = 'Générer automatiquement le document après achevement du cours, sans envoi';
+$string['generateonrestriction'] = 'Générer automatiquement le document après levée de la restriction d\'accès, sans envoi';
 
 // Générer un document ou un document de test
 $string['standardview'] = 'Générer un document de test';
@@ -333,4 +334,4 @@ $string['version_category'] = 'Version';
 $string['courseversion'] = 'Version courante du cours';
 
 // cron task
-$string['sendmailrestriction'] = 'Envoi de couriels après levée des restrictions';
+$string['generaterestriction'] = 'Emmission de documents après levée des restrictions';

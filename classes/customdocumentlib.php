@@ -27,19 +27,21 @@ class customdocumentlib {
     /**
      * Send mail after lifting access restriction
      */
-    public static function sendmailrestriction() {
+    public static function generaterestriction() {
         global $CFG, $DB;
         require_once ($CFG->dirroot . '/mod/customdocument/locallib.php');
 
+        $nbgenerated = 0;
         $nbsendmail = 0;
+        $nbtotal = 0;
 
-        $sql = "SELECT cm.id AS cmid, cd.course AS courseid, cd.id AS customdocid FROM {customdocument} cd ";
+        $sql = "SELECT cm.id AS cmid, cd.course AS courseid, cd.id AS customdocid, cd.delivery AS delivery FROM {customdocument} cd ";
         $sql .= "JOIN {course_modules} cm ON cd.id = cm.instance ";
         $sql .= "JOIN {modules} m ON m.id = cm.module ";
-        $sql .= "WHERE m.name = ? AND cd.delivery = ?;";
+        $sql .= "WHERE m.name = ? AND (cd.delivery = ? OR cd.delivery = ?);";
         
         $now = time();
-        $customdocs = $DB->get_records_sql($sql, array('customdocument', 5));
+        $customdocs = $DB->get_records_sql($sql, array('customdocument', 5, 7));
         
         // For each customdoc where delivery is "Send to student email after lifting the access restriction".
         foreach ($customdocs as $customdoc) {
@@ -77,26 +79,45 @@ class customdocumentlib {
                         // If the document exists and was created now.
                         if ($customdocument->get_issue_file($issuecert)) {
                             if($issuecert->timecreated >= $now){
-                                // Send the mail.
-                                $nbsendmail++;
-                                mtrace("Utilisateur $user->id du cours '$coursename ($customdoc->courseid)', document '$cm->name'");
-                                $ret = $customdocument->send_certificade_email($issuecert);
+                                $nbtotal++;
+                                if($customdoc->delivery == 5){
+                                    // Send the mail.
+                                    mtrace("Utilisateur $user->firstname $user->lastname ($user->id) du cours '$coursename ($customdoc->courseid)', document '$cm->name' (envoyé)");
+                                    $nbsendmail++;
+                                    $ret = $customdocument->send_certificade_email($issuecert);
+                                }
+                                if($customdoc->delivery == 7){
+                                    mtrace("Utilisateur $user->firstname $user->lastname ($user->id) du cours '$coursename ($customdoc->courseid)', document '$cm->name' (généré uniquement)");
+                                    $nbgenerated++;
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        if($nbsendmail == 0){
-            mtrace("Aucun document envoyé par mail");
+        if($nbtotal == 0){
+            mtrace("Aucun document généré ni envoyé par mail");
         }
-        else if($nbsendmail == 1){
-            mtrace("$nbsendmail document envoyé par mail");
-
-        }
-        else{
-            mtrace("$nbsendmail documents envoyés par mail");
-            
+        else {
+            if($nbsendmail <= 1){
+                mtrace("$nbsendmail document envoyé par mail");
+            }
+            else{
+                mtrace("$nbsendmail documents envoyés par mail");
+            }
+            if($nbgenerated <= 1){
+                mtrace("$nbgenerated document généré uniquement");
+            }
+            else{
+                mtrace("$nbgenerated documents générés uniquement");
+            }
+            if($nbtotal == 1){
+                mtrace("$nbtotal document en tout");
+            }
+            else{
+                mtrace("$nbtotal documents en tout");
+            }
         }
     }
 }

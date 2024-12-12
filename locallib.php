@@ -2477,7 +2477,7 @@ class customdocument {
             }
             $cm = get_coursemodule_from_instance($item->itemmodule, $item->iteminstance);
             $modinfo = $this->get_mod_grade($cm->id, $userid);
-            if(!$modinfo->hidden){
+            if(!empty($modinfo) AND !$modinfo->hidden){
                 $usergrade = $this->get_formated_grade($this->get_mod_grade($cm->id, $userid));
                 $retval = $item->itemname . ": $usergrade<br>" . $retval;
             }

@@ -22,7 +22,7 @@
 defined('MOODLE_INTERNAL') || die();
 $tasks = array(
     array(
-        'classname' => '\mod_customdocument\task\send_mail_restriction',
+        'classname' => '\mod_customdocument\task\generate_restriction',
         'blocking' => 0,
         'minute' => '*/2',
         'hour' => '*',

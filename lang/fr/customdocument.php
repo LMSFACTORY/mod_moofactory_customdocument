@@ -237,6 +237,10 @@ $string['customdocument:addinstance'] = "Ajouter une activité Document personna
 $string['customdocument:manage'] = "Gérer l'activité Document personnalisé";
 $string['customdocument:view'] = "Voir l'activité Document personnalisé";
 $string['customdocument:canreceivenotifications'] = "Recevoir les notifications destinées aux enseignants";
+$string['customdocument:canviewgeneratedoctab'] = 'Voir l\'onglet "Générer un document de test"';
+$string['customdocument:canviewissueddoctab'] = 'Voir l\'onglet "Récapitulatif des documents délivrés"';
+$string['customdocument:canviewbulkdoctab'] = 'Voir l\'onglet "Action en lot"';
+$string['customdocument:candeletedocument'] = 'Supprimer un document';
 
 // Erreurs
 $string['filenotfound'] = 'Fichier non trouvé : {$a}';
@@ -307,12 +311,14 @@ $string['usermoofactorytimedesc'] = "Temps passé en heures et en minutes sur le
 // Strigns Course attribution
 $string['moduleattributiontitle'] = "Attribution dans le cours";
 $string['teachersdesc'] = "Liste des contacts du cours, comme défini au niveau de l'administration du site sur la page /admin/settings.php?section=coursecontact";
+$string['studentsdesc'] = "Liste des étudiants";
 $string['userroledesc'] = "Rôles de l'utilisateur dans le cours";
 $string['groupnamedesc'] = "Liste des groupes auxquels est inscrit l'apprenant (en ligne, séparés par une virgule)";
 
 // String Certificate/Document Info
 $string['moduleinfotitle'] = "Informations du Document";
 $string['certcodedesc'] = "Code unique du document";
+$string['documentiddesc'] = "Id du document";
 
 $string['formatnotfound'] = "Avertissement: Le plugin 'Format de cours moofactory' est nécessaire";
 $string['formatfound'] = "Le plugin 'Format de cours moofactory' est bien installé. Vous pouvez utiliser pleinement le document personnalisé moofactory. Plus d'information sur la suite <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a> ";

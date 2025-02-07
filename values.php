@@ -266,6 +266,10 @@ echo $OUTPUT->header();
                     <td><?php echo get_string('teachersdesc', 'customdocument') ?></td>
                 </tr>
                 <tr>
+                    <td>{{STUDENTS}}</td>
+                    <td><?php echo get_string('studentsdesc', 'customdocument') ?></td>
+                </tr>
+                <tr>
                     <td>{{USERROLENAME}}</td>
                     <td><?php echo get_string('userroledesc', 'customdocument') ?></td>
                 </tr>
@@ -286,6 +290,10 @@ echo $OUTPUT->header();
                 <tr>
                     <td>{{CERTIFICATECODE}}</td>
                     <td><?php echo get_string('certcodedesc', 'customdocument') ?></td>
+                </tr>
+                <tr>
+                    <td>{{DOCUMENTID}}</td>
+                    <td><?php echo get_string('documentiddesc', 'customdocument') ?></td>
                 </tr>
 
             </tbody>

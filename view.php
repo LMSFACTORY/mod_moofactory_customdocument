@@ -46,7 +46,8 @@ else{
 $type = optional_param('type', '', PARAM_ALPHA);
 $page = optional_param('page', 0, PARAM_INT);
 $perpage = optional_param('perpage', get_config('customdocument', 'perpage'), PARAM_INT);
-$orderby = optional_param('orderby', 'username', PARAM_RAW);
+$orderby = optional_param('orderby', 'issuedate', PARAM_RAW);
+// $orderby = optional_param('orderby', 'username', PARAM_RAW);
 $issuelist = optional_param('issuelist', null, PARAM_ALPHA);
 $selectedusers = optional_param_array('selectedusers', null, PARAM_INT);
 $selectedissues = optional_param_array('selectedissues', null, PARAM_INT);
@@ -67,6 +68,21 @@ if (!$certificate) {
 }
 
 $context = context_module::instance ($cm->id);
+$canviewgeneratedoctab = has_capability('mod/customdocument:canviewgeneratedoctab', $context);
+$canviewissueddoctab = has_capability('mod/customdocument:canviewissueddoctab', $context);
+$canviewbulkdoctab = has_capability('mod/customdocument:canviewbulkdoctab', $context);
+
+if ($tab == customdocument::ISSUED_CERTIFCADES_VIEW) {
+    if(!$canviewissueddoctab) {
+        if($canviewgeneratedoctab) {
+            $tab = customdocument::DEFAULT_VIEW;
+        }
+        elseif($canviewbulkdoctab) {
+            $tab = customdocument::BULK_ISSUE_CERTIFCADES_VIEW;
+        }
+    }
+}
+
 $url = new moodle_url('/mod/customdocument/view.php', array (
         'id' => $cm->id,
         'tab' => $tab,

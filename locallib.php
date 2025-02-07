@@ -838,20 +838,20 @@ class customdocument {
             // die;
             
             // if (has_capability('mod/customdocument:manage', $this->context, $userid) && $isnotstudent) {
-                if (has_capability('mod/customdocument:manage', $this->context, $userid) && !$isstudent) {
-                    $issuedcert->id = 0;
-                } else {
-                    $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
-                    
-                    // Email to the teachers and anyone else.
-                    if (!empty($this->get_instance()->emailteachers)) {
-                        $this->send_alert_email_teachers($issuedcert);
-                    }
-                    
-                    if (!empty($this->get_instance()->emailothers)) {
-                        $this->send_alert_email_others($issuedcert);
-                    }
+            if (has_capability('mod/customdocument:manage', $this->context, $userid) && !$isstudent) {
+                $issuedcert->id = 0;
+            } else {
+                $issuedcert->id = $DB->insert_record('customdocument_issues', $issuedcert);
+                
+                // Email to the teachers and anyone else.
+                if (!empty($this->get_instance()->emailteachers)) {
+                    $this->send_alert_email_teachers($issuedcert);
                 }
+                
+                if (!empty($this->get_instance()->emailothers)) {
+                    $this->send_alert_email_others($issuedcert);
+                }
+            }
         }
 
         // If cache or db issued certificate is maked as haschange, must update.
@@ -1090,9 +1090,8 @@ class customdocument {
      */
     protected function get_teachers($fusionfield=false) {
         global $CFG, $DB;
-        $teachers = array();
 
-    
+        $teachers = array();
         if ($fusionfield && !empty($CFG->coursecontact)) {
             $coursecontactroles = explode(',', $CFG->coursecontact);
         } else {
@@ -1116,6 +1115,31 @@ class customdocument {
     }
 
     /**
+     * Returns a list of teachers by group
+     * for sending email alerts to teachers
+     *
+     * @return array the teacher array
+     */
+    protected function get_students() {
+        global $DB;
+
+        $students = array();
+        $coursectx = $this->get_course_context();
+        $enrolledusers = get_enrolled_users($coursectx, '', 0, 'u.*', $DB->sql_fullname(), 0, 0, true);
+        $studentroles = array_keys(get_archetype_roles('student'));
+        $users = get_role_users($studentroles, $coursectx, false, 'u.id', null, true, '', '', '');
+        foreach ($enrolledusers as $enrolleduser) {
+            $isstudent = !empty($users[$enrolleduser->id]);
+            $ismanager = has_capability('mod/customdocument:manage', $this->context, $enrolleduser->id);
+            if($isstudent && !$ismanager){
+                $students[] = $enrolleduser;
+            }
+        }
+        return $students;
+    }
+
+
+    /**
      * Alerts teachers by email of received certificates.
      * First checks whether the option to email teachers is set for this certificate.
      */
@@ -1131,7 +1155,12 @@ class customdocument {
                 $teachergroups = explode(',', $this->getGroupData($userid, $this->course->id));
                 $usergroups = explode(',', $this->getGroupData($issuedcert->userid, $this->course->id));
 
-                if (($groupmode == VISIBLEGROUPS || $aag || !empty(array_intersect($teachergroups, $usergroups))) && has_capability('mod/customdocument:canreceivenotifications', $this->context, $userid)){
+                $intersect = array_intersect($teachergroups, $usergroups);
+                // Searching if intersection between teachergroups and usergroups is an empty string (no group) or a group name.
+                $searchnogroup = array_search('', $intersect);
+                // If searchnogroup is not false, intersection corresponds to "no group". Don't send mail !
+
+                if (($groupmode == VISIBLEGROUPS || $aag || (!empty($intersect) && $searchnogroup === false)) && has_capability('mod/customdocument:canreceivenotifications', $this->context, $userid)){
                     $info = new stdClass;
                     $info->email = $teacher->user->email;
                     $info->username = ' '.format_string(fullname($teacher->user), true);
@@ -1880,6 +1909,7 @@ class customdocument {
         $a->activitycompletiondate = $this->get_date($issuecert, $user->id);
         $a->outcome = $this->get_outcome($user->id);
         $a->certificatecode = $issuecert->code;
+        $a->documentid = $issuecert->id;
 
         // NOTE: Each function for all the merge fields is defined below.
 
@@ -1912,7 +1942,7 @@ class customdocument {
             $a->$key = strip_tags($value);
         }
 
-        // This code stay here only beace legacy support, coursehours variable was removed
+        // This code stay here only because legacy support, coursehours variable was removed
         // see issue 61 https://github.com/bozoh/moodle-mod_customdocument/issues/61.
         // if (isset($this->get_instance()->coursehours)) {
         //     $a->hours = strip_tags($this->get_instance()->coursehours . ' ' . get_string('hours', 'customdocument'));
@@ -1922,13 +1952,24 @@ class customdocument {
 
         $teachers = $this->get_teachers(true);
         if (empty($teachers)) {
-            $teachers = '';
+            $a->teachers = '';
         } else {
             $t = array();
             foreach ($teachers as $teacher) {
                 $t[] = content_to_text($teacher->rolename . get_string('colon', 'customdocument') . $teacher->username, FORMAT_MOODLE);
             }
             $a->teachers = implode("<br>", $t);
+        }
+
+        $students = $this->get_students();
+        if (empty($students)) {
+            $a->students = '';
+        } else {
+            $s = array();
+            foreach ($students as $student) {
+                $s[] = content_to_text($student->firstname . ' ' . $student->lastname, FORMAT_MOODLE);
+            }
+            $a->students = implode(", ", $s);
         }
 
         // Fetch user actitivy grades.
@@ -1965,6 +2006,7 @@ class customdocument {
         } else {
             $a->enrolmenttimestart = '';
         }
+
         $a = (array)$a;
 
         // For compatibility with previous versions user's documents, $search and $search2 are used 
@@ -2647,15 +2689,27 @@ class customdocument {
     protected function show_tabs(moodle_url $url) {
         global $OUTPUT, $CFG;
 
-        $tabs[] = new tabobject(self::DEFAULT_VIEW, $url->out(false, array('tab' => self::DEFAULT_VIEW)),
-                                get_string('standardview', 'customdocument'));
+        $cm = $this->get_course_module();
+        $context = context_module::instance ($cm->id);
+        $canviewgeneratedoctab = has_capability('mod/customdocument:canviewgeneratedoctab', $context);
+        $canviewissueddoctab = has_capability('mod/customdocument:canviewissueddoctab', $context);
+        $canviewbulkdoctab = has_capability('mod/customdocument:canviewbulkdoctab', $context);
 
-        $tabs[] = new tabobject(self::ISSUED_CERTIFCADES_VIEW, $url->out(false, array('tab' => self::ISSUED_CERTIFCADES_VIEW)),
-                                get_string('issuedview', 'customdocument'));
+        if($canviewgeneratedoctab){
+            $tabs[] = new tabobject(self::DEFAULT_VIEW, $url->out(false, array('tab' => self::DEFAULT_VIEW)),
+                                    get_string('standardview', 'customdocument'));
+        }
 
-        $tabs[] = new tabobject(self::BULK_ISSUE_CERTIFCADES_VIEW,
-                                $url->out(false, array('tab' => self::BULK_ISSUE_CERTIFCADES_VIEW)),
-                                get_string('bulkview', 'customdocument'));
+        if($canviewissueddoctab){
+            $tabs[] = new tabobject(self::ISSUED_CERTIFCADES_VIEW, $url->out(false, array('tab' => self::ISSUED_CERTIFCADES_VIEW)),
+                                    get_string('issuedview', 'customdocument'));
+        }
+
+        if($canviewbulkdoctab){
+            $tabs[] = new tabobject(self::BULK_ISSUE_CERTIFCADES_VIEW,
+                                    $url->out(false, array('tab' => self::BULK_ISSUE_CERTIFCADES_VIEW)),
+                                    get_string('bulkview', 'customdocument'));
+        }
 
         if (!$url->get_param('tab')) {
             $tab = self::DEFAULT_VIEW;
@@ -2737,13 +2791,13 @@ class customdocument {
         }
     }
 
-    protected function get_issued_certificate_users($sort = 'username', $groupmode = 0) {
+    protected function get_issued_certificate_users($sort = 'issuedate', $groupmode = 0) {
         global $CFG, $DB, $SESSION;
 
         if ($sort == 'username') {
-            $sort = $DB->sql_fullname() . ' ASC, ci.timecreated ASC';
+            $sort = $DB->sql_fullname() . ' ASC, ci.timecreated DESC';
         } else if ($sort == 'issuedate') {
-            $sort = 'ci.timecreated ASC';
+            $sort = 'ci.timecreated DESC';
         } else {
             $sort = '';
         }
@@ -2850,6 +2904,15 @@ class customdocument {
             $table->tablealign = "center";
             $selectAllchkBox = html_writer::checkbox('selectallusersdocuments', '',false);
             $table->head = array($selectAllchkBox, get_string('firstname', 'customdocument'), get_string('lastname', 'customdocument'),$strdate, $strgrade, $strcode);
+
+            if($orderby == "issuedate"){
+                $table->colclasses = array("", "", "", "th-sort-desc", "", "");
+            }
+            else{
+                $table->colclasses = array("", "", "", "", "", "");
+            }
+
+
             $table->align = array("left", "left", "left", "center", "center");
             $table->size = array('1%', '15%', '15%' ,'25%', '5%', '30%');
 
@@ -2885,6 +2948,7 @@ class customdocument {
                         $table->rowclasses[] = "";
                         $grade = $this->get_grade($user->id);
                     }
+                    
                     $code = $user->code;
                     $table->data[] = array($chkbox, $name, $lastname ,$date, $grade, $code);
 
@@ -2892,15 +2956,22 @@ class customdocument {
             }
 
             // Create table to store buttons.
+            $cm = $this->get_course_module();
+            $context = context_module::instance ($cm->id);
+            $candeletedocument = has_capability('mod/customdocument:candeletedocument', $context);
+
+
             $tablebutton = new html_table();
             $tablebutton->attributes['class'] = 'downloadreport test';
 
-            $deleteselectedbutton = $OUTPUT->single_button(
+            if($candeletedocument) {
+                $deleteselectedbutton = $OUTPUT->single_button(
                             $url->out_as_local_url(false, array('action' => 'delete', 'type' => 'selected')),
                             get_string('deleteselected', 'customdocument'));
-            $deleteallbutton = $OUTPUT->single_button(
-                            $url->out_as_local_url(false, array('action' => 'delete', 'type' => 'all')),
-                            get_string('deleteall', 'customdocument'));
+                $deleteallbutton = $OUTPUT->single_button(
+                                $url->out_as_local_url(false, array('action' => 'delete', 'type' => 'all')),
+                                get_string('deleteall', 'customdocument'));
+            }
             $btndownloadods = $OUTPUT->single_button(
                             $url->out_as_local_url(false, array('action' => 'download', 'type' => 'ods')),
                             get_string("downloadods"));
@@ -2910,12 +2981,20 @@ class customdocument {
             $btndownloadtxt = $OUTPUT->single_button(
                             $url->out_as_local_url(false, array('action' => 'download', 'type' => 'txt')),
                             get_string("downloadtext"));
-            $tablebutton->data[] = array($deleteselectedbutton,
-                                   $deleteallbutton,
-                                   $btndownloadods,
-                                   $btndownloadxls,
-                                   $btndownloadtxt
-            );
+            if($candeletedocument) {
+                $tablebutton->data[] = array($deleteselectedbutton,
+                    $deleteallbutton,
+                    $btndownloadods,
+                    $btndownloadxls,
+                    $btndownloadtxt
+                );
+            }
+            else {
+                $tablebutton->data[] = array($btndownloadods,
+                    $btndownloadxls,
+                    $btndownloadtxt
+                );
+            }
 
             echo '<br />';
             echo '<form id="bulkissue" name="bulkissue" method="post" action="view.php">';
@@ -3148,9 +3227,11 @@ class customdocument {
         $pagestart = intval($page * $perpage);
         $usercount = 0;
         $users = array();
+
         if (!$selectedusers) {
             // Seuls les users ayant accès au certificat sont pris en compte
-            $enrolledusers = get_enrolled_users($coursectx, '', $groupid);
+            // $enrolledusers = get_enrolled_users($coursectx, '', $groupid);
+            $enrolledusers = get_enrolled_users($coursectx, '', $groupid, 'u.*', $DB->sql_fullname());
             foreach ($enrolledusers as $user) {
                 $canissue = $this->can_issue($user, $issuelist != 'allusers');
                 if (empty($canissue)) {
@@ -3243,12 +3324,13 @@ class customdocument {
             $type = $url->get_param('type');
 
             // Calculate file name.
+            $shortname = substr($this->get_course()->shortname, 0, 20);
+            $certname = substr(format_string($this->get_instance()->name, true), 0, 20);
             $filename = str_replace(' ', '_',
-                                    clean_filename(
-                                                $this->get_instance()->coursename . ' ' .
-                                                 get_string('modulenameplural', 'customdocument') . ' ' .
-                                                 strip_tags(format_string($this->get_instance()->name, true)) . '.' .
-                                                 strip_tags(format_string($type, true))));
+                            clean_filename(
+                                $shortname . '-' .
+                                strip_tags($certname) . '.' .
+                                strip_tags(format_string($type, true))));
 
             switch ($type) {
 

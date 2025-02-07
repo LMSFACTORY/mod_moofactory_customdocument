@@ -238,6 +238,10 @@ $string['customdocument:addinstance'] = "Add Custom document Activity";
 $string['customdocument:manage'] = "Manage Custom document Activity";
 $string['customdocument:view'] = "View Custom document Activity";
 $string['customdocument:canreceivenotifications'] = "Receive notifications for teachers";
+$string['customdocument:canviewgeneratedoctab'] = 'View "Issue a test document" tab';
+$string['customdocument:canviewissueddoctab'] = 'View "Issued documents summary" tab';
+$string['customdocument:canviewbulkdoctab'] = 'View "Bulk operations" tab';
+$string['customdocument:candeletedocument'] = 'Delete document';
 
 // Erreurs
 $string['filenotfound'] = 'File not Found : {$a}';
@@ -311,12 +315,14 @@ $string['usermoofactorytimedesc'] = "Time spent in hours and minutes according t
 // Strigns Course attribution
 $string['moduleattributiontitle'] = "In-course role and group";
 $string['teachersdesc'] = "List of course contacts, as defined at the site administration level on the page /admin/settings.php?section=coursecontact";
+$string['studentsdesc'] = "Students list";
 $string['userroledesc'] = "User role in course";
 $string['groupnamedesc'] = "User group list (display in line, separated by a comma)";
 
 // String Certificate/Document Info
 $string['moduleinfotitle'] = "Document information";
 $string['certcodedesc'] = "Document unique code";
+$string['documentiddesc'] = "Document id";
 
 $string['formatnotfound'] = "Warning: Plugin 'moofactory course format' is neccessary";
 $string['formatfound'] = "Plugin 'moofactory course format' is installed. You can fully use moofactory custom document. For more information, visit our site: <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a>";

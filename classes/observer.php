@@ -36,24 +36,27 @@ class observer {
         global $DB, $CFG;
         require_once ($CFG->dirroot . '/mod/customdocument/locallib.php');
 
-        $sql = "SELECT cd.* FROM {customdocument} cd ";
+        $sql = "SELECT cd.*, cm.visible FROM {customdocument} cd ";
         $sql .= "JOIN {course_modules} cm ON cd.id = cm.instance ";
         $sql .= "JOIN {modules} m ON m.id = cm.module ";
         $sql .= "WHERE m.name = ? AND cm.course = ? AND (cd.delivery = ? OR cd.delivery = ?) AND cm.deletioninprogress = 0;";
         $customdocs = $DB->get_records_sql($sql, array('customdocument', $event->courseid, 4, 6));
 
         foreach ($customdocs as $customdoc) {
-            $cm = get_coursemodule_from_instance( 'customdocument', $customdoc->id, $event->courseid );
-            $context = \context_module::instance($cm->id);
-            $course = $DB->get_record('course', array('id' => $cm->course));
-            $user = $DB->get_record('user', array('id' => $event->relateduserid));
-            $customdocument = new \customdocument($context, $cm, $course);
-            $issuecert = $customdocument->get_issue($user);
-            // If delivery option is 4, send email with certificate.
-            // If delivery option is 6, just generate certificate and no email is sent.
-            if ($customdocument->get_issue_file($issuecert)) {
-                if ($customdoc->delivery == 4) {
-                    $ret = $customdocument->send_certificade_email($issuecert);
+            $coursevisible = $DB->get_field('course', 'visible',  ['id' => $event->courseid]);
+            if($customdoc->visible && $coursevisible){
+                $cm = get_coursemodule_from_instance( 'customdocument', $customdoc->id, $event->courseid );
+                $context = \context_module::instance($cm->id);
+                $course = $DB->get_record('course', array('id' => $cm->course));
+                $user = $DB->get_record('user', array('id' => $event->relateduserid));
+                $customdocument = new \customdocument($context, $cm, $course);
+                $issuecert = $customdocument->get_issue($user);
+                // If delivery option is 4, send email with certificate.
+                // If delivery option is 6, just generate certificate and no email is sent.
+                if ($customdocument->get_issue_file($issuecert)) {
+                    if ($customdoc->delivery == 4) {
+                        $ret = $customdocument->send_certificade_email($issuecert);
+                    }
                 }
             }
         }

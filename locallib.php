@@ -2740,10 +2740,10 @@ class customdocument {
                 die();
             }
 
-            if (!empty($this->get_instance()->intro)) {
-                echo $OUTPUT->box(format_module_intro('customdocument', $this->get_instance(), $this->coursemodule->id),
-                                'generalbox', 'intro');
-            }
+            // if (!empty($this->get_instance()->intro)) {
+            //     echo $OUTPUT->box(format_module_intro('customdocument', $this->get_instance(), $this->coursemodule->id),
+            //                     'generalbox', 'intro');
+            // }
 
             $attempts = $this->get_attempts();
             if ($attempts) {
@@ -3297,7 +3297,6 @@ class customdocument {
             // BUG #157, the paging is afecting download files,
             // so only apply paging when displaying users.
             $users = array_slice($users, $pagestart, $perpage);
-
 
             foreach ($users as $user) {
                 $canissue = $this->can_issue($user, $issuelist != 'allusers');

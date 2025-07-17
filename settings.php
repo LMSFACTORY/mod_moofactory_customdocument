@@ -95,9 +95,9 @@ if ($ADMIN->fulltree) {
     if(array_key_exists('moofactory_resetmod', \core_component::get_plugin_list('local'))){
         // Validity.
         $settings->add(new admin_setting_configtext('customdocument/validity', get_string('defaultvalidity', 'customdocument'),
-                get_string('validity_help', 'customdocument'), 36, PARAM_INT));
+                get_string('validity_help', 'customdocument'), 0, PARAM_INT));
         $settings->add(new admin_setting_configtext('customdocument/renewalperiod', get_string('defaultrenewalperiod', 'customdocument'),
-                get_string('renewalperiod_help', 'customdocument'), 12, PARAM_INT));
+                get_string('renewalperiod_help', 'customdocument'), 0, PARAM_INT));
         $settings->add(new admin_setting_configcheckbox('customdocument/resetall',
                 get_string('resetall', 'customdocument'), get_string('resetall_help', 'customdocument'), 1));
         }

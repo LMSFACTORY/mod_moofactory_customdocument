@@ -65,6 +65,9 @@ function customdocument_update_instance(stdclass $data) {
     if (empty($data->resetall) ) {
         $data->resetall = "0";
     }
+    if (empty($data->minfortest) ) {
+        $data->minfortest = "0";
+    }
 
     $context = context_module::instance($data->coursemodule);
     $customdocument = new customdocument($context, null, null);

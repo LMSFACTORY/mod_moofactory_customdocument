@@ -447,14 +447,14 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
     if ($oldversion < 2023032202) {
         $table = new xmldb_table('customdocument');
 
-        $field = new xmldb_field('validity', XMLDB_TYPE_INTEGER, '4', null, null, null, '12', 'timestartdatefmt');
+        $field = new xmldb_field('validity', XMLDB_TYPE_INTEGER, '4', null, null, null, '0', 'timestartdatefmt');
 
         // Conditionally launch add field validity.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        $field = new xmldb_field('renewalperiod', XMLDB_TYPE_INTEGER, '4', null, null, null, '2', 'validity');
+        $field = new xmldb_field('renewalperiod', XMLDB_TYPE_INTEGER, '4', null, null, null, '0', 'validity');
 
         // Conditionally launch add field renewalperiod.
         if (!$dbman->field_exists($table, $field)) {
@@ -472,7 +472,7 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
 
         $field = new xmldb_field('timedisabled', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timedeleted');
 
-        // Conditionally launch add field validity.
+        // Conditionally launch add field timedisabled.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -643,6 +643,16 @@ function xmldb_customdocument_upgrade($oldversion = 0) {
         $field = new xmldb_field('fourthimage', XMLDB_TYPE_TEXT, null, null, null, null, null, 'fourthpagetextformat');
 
         // Conditionally launch add field fourthimage.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
+
+    if ($oldversion < 2025071500) {
+        $table = new xmldb_table('customdocument');
+        $field = new xmldb_field('minfortest', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'resetall');
+
+        // Conditionally launch add field enablethirdpage.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }

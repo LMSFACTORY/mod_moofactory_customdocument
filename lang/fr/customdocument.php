@@ -325,14 +325,17 @@ $string['formatfound'] = "Le plugin 'Format de cours moofactory' est bien instal
 $string['formatwarning'] = "Avertissement : pour utiliser le champs de fusion {USERMOOFACTORYTIME} vous devez installer le plugin 'Format de cours moofactory'. Plus d'information sur ce plugin : <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a>";
 
 // Validity.
+$string['validityoptions'] = 'Validité du document';
 $string['validity'] = 'Durée de validité du document, en mois.';
-$string['validity_help'] = 'Durée pendant laquelle le document est valide.';
+$string['validity_help'] = 'Durée pendant laquelle le document est valide. Si la valeur est 0, le document reste valide sans limite de temps.';
 $string['defaultvalidity'] = 'Durée de validité par défaut du document, en mois.';
 $string['renewalperiod'] = 'Délai de renouvellement du document, en semaines.';
-$string['renewalperiod_help'] = 'Délai pendant lequel l\'utilisateur à la possibilité de renouveler son document. La date de début est calulée en fontion de la durée de validité. À partir de cette date, l\'utilisateur devra à nouveau lever les éventuelles restrictions pour l\'obtention d\'un nouveau document.';
+$string['renewalperiod_help'] = 'Délai pendant lequel l\'utilisateur à la possibilité de renouveler son document. La date de début est calculée en fontion de la durée de validité. À partir de cette date, l\'utilisateur devra à nouveau lever les éventuelles restrictions pour l\'obtention d\'un nouveau document. Si la durée de validité est 0, la valeur de ce champ est sans effet.';
 $string['defaultrenewalperiod'] = 'Délai de renouvellement par défaut du document, en semaines.';
 $string['resetall'] = 'Réinitialiser toutes les activités du cours.';
 $string['resetall_help'] = 'Si cette case est cochée, toutes les activités du cours seront réinitialisées à la date de début de la période de renouvellement (achèvement et note). Dans le cas contraire, seules les activités faisant l\'objet de restrictions pour l\'obtention d\'un nouveau document le seront.';
+$string['minfortest'] = 'Durée de validité du document convertie en minutes pour tests.';
+$string['minfortest_help'] = 'Si cette case est cochée, la durée de validité du document sera convertie en minutes pour effectuer des tests sur une courte période.';
 $string['expired'] = ' <span class="expired">(périmé)</span>';
 $string['expiredtxt'] = ' (périmé)';
 

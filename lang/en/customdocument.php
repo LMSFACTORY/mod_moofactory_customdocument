@@ -329,14 +329,18 @@ $string['formatfound'] = "Plugin 'moofactory course format' is installed. You ca
 $string['formatwarning'] = "Warning : To use the {USERMOOFACTORYTIME} merge field you need to install the 'Moofactory course format' plugin. More information about this plugin: <a href='https://moofactory.fr/' target='_blank'>moofactory.fr</a>";
 
 // Validity.
+$string['validityoptions'] = 'Validity of the document';
+
 $string['validity'] = 'Period of validity of the document, in months.';
-$string['validity_help'] = 'Duration the document is valid.';
+$string['validity_help'] = 'Duration the document is valid. If the value is 0, the document remains valid without time limit.';
 $string['defaultvalidity'] = 'Default period of validity of the document, in months.';
 $string['renewalperiod'] = 'Document renewal time, in weeks.';
-$string['renewalperiod_help'] = 'Period during which the user can renew his document. The start date is calculated according to the validity period. From this date, the user will again have to lift any restrictions for obtaining a new document.';
+$string['renewalperiod_help'] = 'Period during which the user can renew his document. The start date is calculated according to the validity period. From this date, the user will again have to lift any restrictions for obtaining a new document. If the validity period is 0, the value of this field has no effect.';
 $string['defaultrenewalperiod'] = 'Default document renewal time, in weeks.';
 $string['resetall'] = 'Reset all course activities.';
 $string['resetall_help'] = 'If checked, all course activities will be reset from the start date of the renewal period (completion and grade). Otherwise, only activities subject to restrictions for obtaining a new document will be.';
+$string['minfortest'] = 'Document validity period converted to minutes for testing.';
+$string['minfortest_help'] = 'If this box is checked, the document validity period will be converted into minutes to perform tests over a short period of time.';
 $string['expired'] = ' <span class="expired">(expired)</span>';
 $string['expiredtxt'] = ' (expired)';
 

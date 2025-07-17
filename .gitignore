@@ -22,3 +22,4 @@ composer.lock
 # lib/yuilib/version/module/module-coverage.js
 /lib/yuilib/*/*/*-coverage.js
 .vscode
+dateupdate.php

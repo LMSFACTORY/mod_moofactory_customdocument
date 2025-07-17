@@ -122,28 +122,6 @@ class mod_customdocument_mod_form extends moodleform_mod {
         $mform->setAdvanced('certificatetexty');
         $mform->addHelpButton('certificatetexty', 'textposition', 'customdocument');
 
-        if(array_key_exists('moofactory_resetmod', \core_component::get_plugin_list('local'))){
-            // Certificate period of validity.
-            $mform->addElement('text', 'validity', get_string('validity', 'customdocument'), array('size' => '5'));
-            $mform->setType('validity', PARAM_INT);
-            $mform->setDefault('validity', get_config('customdocument', 'validity'));
-            $mform->setAdvanced('validity');
-            $mform->addHelpButton('validity', 'validity', 'customdocument');
-            
-            // Certificate renewal period.
-            $mform->addElement('text', 'renewalperiod', get_string('renewalperiod', 'customdocument'), array('size' => '5'));
-            $mform->setType('renewalperiod', PARAM_INT);
-            $mform->setDefault('renewalperiod', get_config('customdocument', 'renewalperiod'));
-            $mform->setAdvanced('renewalperiod');
-            $mform->addHelpButton('renewalperiod', 'renewalperiod', 'customdocument');
-
-            // Reset all modules.
-            $mform->addElement('checkbox', 'resetall', get_string('resetall', 'customdocument'));
-            $mform->setDefault('resetall', get_config('customdocument', 'resetall'));
-            $mform->setAdvanced('resetall');
-            $mform->addHelpButton('resetall', 'resetall', 'customdocument');
-        }
-
 
         // Second page.
         $mform->addElement('header', 'secondpageoptions', get_string('secondpageoptions', 'customdocument'));
@@ -356,7 +334,6 @@ class mod_customdocument_mod_form extends moodleform_mod {
 
 
         // Issue options.
-
         $mform->addElement('header', 'issueoptions', get_string('issueoptions', 'customdocument'));
 
         // Email to teachers ?
@@ -392,6 +369,34 @@ class mod_customdocument_mod_form extends moodleform_mod {
         $mform->addElement('select', 'delivery', get_string('delivery', 'customdocument'), $deliveryoptions);
         $mform->setDefault('delivery', 0);
         $mform->addHelpButton('delivery', 'delivery', 'customdocument');
+
+        if(array_key_exists('moofactory_resetmod', \core_component::get_plugin_list('local'))){
+            // Validity options.
+            $mform->addElement('header', 'validityoptions', get_string('validityoptions', 'customdocument'));
+
+            // Certificate period of validity.
+            $mform->addElement('text', 'validity', get_string('validity', 'customdocument'), array('size' => '5'));
+            $mform->setType('validity', PARAM_INT);
+            $mform->setDefault('validity', get_config('customdocument', 'validity'));
+            $mform->addHelpButton('validity', 'validity', 'customdocument');
+            
+            // Certificate renewal period.
+            $mform->addElement('text', 'renewalperiod', get_string('renewalperiod', 'customdocument'), array('size' => '5'));
+            $mform->setType('renewalperiod', PARAM_INT);
+            $mform->setDefault('renewalperiod', get_config('customdocument', 'renewalperiod'));
+            $mform->addHelpButton('renewalperiod', 'renewalperiod', 'customdocument');
+
+            // Reset all modules.
+            $mform->addElement('checkbox', 'resetall', get_string('resetall', 'customdocument'));
+            $mform->setDefault('resetall', get_config('customdocument', 'resetall'));
+            $mform->addHelpButton('resetall', 'resetall', 'customdocument');
+
+            // Certificate period of validity converted to minutes for tests.
+            $mform->addElement('checkbox', 'minfortest', get_string('minfortest', 'customdocument'));
+            $mform->setDefault('minfortest', false);
+            $mform->setAdvanced('minfortest');
+            $mform->addHelpButton('minfortest', 'minfortest', 'customdocument');
+        }
 
         // Report Cert.
         // TODO acredito que seja para verificar o certificado pelo código, se for isto pode remover.
